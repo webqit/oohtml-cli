@@ -330,9 +330,9 @@ This specifies the attribute that gives `<export>` elements (or [`[export_elemen
 
 ### Bundling Assets
 
-While HTML modules are created by reading the file's contents, assets, like images, are handled differently. These files are copied from their location in [`[entry_dir]`](#entry_dir) into [`[output_dir]`](#output_dir) when these happen to be two different locations on the filesystem. Copying them to [`[output_dir]`](#output_dir) makes them accessible to HTTP requests. An appropriate HTML element that points to an asset's *public* location is automatically generated as a *module export* in the bundle. This is illustrated below.
+While HTML files are created by reading the file's contents, assets, like images, are handled differently. These files are copied from their location in [`[entry_dir]`](#entry_dir) into [`[output_dir]`](#output_dir) when these happen to be two different locations on the filesystem. Copying them to [`[output_dir]`](#output_dir) makes them accessible to HTTP requests. An appropriate HTML element that points to an asset's *public* location is automatically generated as a *module export* in the bundle. This is illustrated below.
 
-We have an image file at `my-app/views/about` and we have set [`[entry_dir]`](#entry_dir) to `./views` and [`[output_dir]`](#output_dir) to `./public`.
+We have an image file at `my-app/views/about`, and we have set [`[entry_dir]`](#entry_dir) to `./views` and [`[output_dir]`](#output_dir) to `./public`.
 
 ```html
 my-app
@@ -341,7 +341,7 @@ my-app
       │    ├── image1.png
       │    └── main.html <main class="page-container">About Page</main>
       └── home
-           └── main.html <main class="page-container">Home Page</main>
+            └── main.html <main class="page-container">Home Page</main>
 ```
 
 On running the **`oohtml bundle`** command, our final directory structure will be...
@@ -349,14 +349,14 @@ On running the **`oohtml bundle`** command, our final directory structure will b
 ```html
 my-app
   ├── public
-  |   └── about
-  │       └── image1.png
+  │   └── about
+  │         └── image1.png
   └── views
-      ├── about
-      │    ├── image1.png
-      │    └── main.html <main class="page-container">About Page</main>
-      └── home
-           └── main.html <main class="page-container">Home Page</main>
+       ├── about
+       │    ├── image1.png
+       │    └── main.html <main class="page-container">About Page</main>
+       └── home
+             └── main.html <main class="page-container">Home Page</main>
 ```
 
 ...and an `<img>` element pointing to the *public* location of `image1.png` is added as a *module export* to the bundle.
@@ -373,7 +373,7 @@ my-app
 </template>
 ```
 
-But where the file size of that image is smaller than `1024` - [`[max_data_url_size]`](#max_data_url_size), its contents is *inlined* as [data URLs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs), and no copying takes place on the filesystem.
+But where the file size of that image is smaller than `1024` - [`[max_data_url_size]`](#max_data_url_size), its contents is *inlined* as [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs), and no copying takes place on the filesystem.
 
 ```html
 <template name="home">
@@ -390,23 +390,25 @@ This way, the browser won't have to load it via a HTTP request. (Cutting down on
 
 ### Bundler Plugins
 
-OOHTML CLI plugins are packages that extend the capabilities of the OOHTML Bundler. OOHTML CLI comes with certain plugins built-in and also makes it possible to provide custom plugins.
+OOHTML CLI plugins are packages that extend the capabilities of the OOHTML Bundler. OOHTML CLI comes with certain plugins built-in, and it also makes it possible to provide custom plugins.
 
 #### Overview
 
-Plugins are functions that are called with each file during the bundling process. Multiple plugins are made cascaded and a plugin will be expected to call the next. This makes for an awesome processing pipeline for each file being bundled. But it also requires thoughtfulness in the order in which these plugins are specified.
+Plugins are functions that are called with each file during the bundling process. Multiple plugins are taken in cascade order where a plugin is responsible for calling the next. This makes for an awesome processing pipeline for each file being bundled.
 
-By default, the main OOHTML CLI bundler only handles `.html` files and images, audio and video files. Then it features built-in plugins that extend the list.
+> This, however, requires thoughtfulness in the order in which these plugins are specified.
+
+By default, the main OOHTML CLI bundler only handles `.html` files, and images, audio and video files. Then it features built-in plugins that extend the list.
 
 #### Built-Ins
 
 ##### `md-loader`
 
-The `md-loader` plugin is used to load `.md` (markdown) files into HTML exports just the way regular HTML files are. It takes an initial step of converting the markdown content into HTML using the [Showdown](https://github.com/showdownjs/showdown) library, then goes ahead to add it to the bundle as a *module export*. Markdown links are automatically resolved to better work as HTML links. And a few other transformations are supported through arguments/flags. (Learn more about specifying arguments/flags for a plugin [here](#plugins).)
+The `md-loader` plugin is used to load `.md` (markdown) files into HTML exports, just the way regular HTML files are. It takes an initial step of converting the markdown content into HTML using the [Showdown](https://github.com/showdownjs/showdown) library, then goes ahead to add it to the bundle as a *module export*. Markdown links are automatically resolved to better work as HTML links. And a few other transformations are supported through arguments/flags. (Learn more about specifying arguments/flags for a plugin [here](#plugins).)
 
 ###### Arguments/Flags
 
- All parameters are optional.
+All parameters are optional.
 
 + **`base_url`** - Set this to a value that will be used as the base URL for relative links. This is similar to how the [`[public_base_url]`](#public_base_url) option works.
 + **`outline_generation`** - Set this to a *non-empty* value to generate a JSON outline of the page's content. The generated outline will show up in the meta data for the file in the bundle's overall [JSON outline](#create_outline_file).
@@ -415,7 +417,7 @@ The `md-loader` plugin is used to load `.md` (markdown) files into HTML exports 
 
 ###### Other
 
-+ **Markdown Metadata** - By default, `md-loader` automatically parses any found markdown metadata (defined at the top of the document between ««« and »»» or between --- and ---) into JSON and this will show up in the meta data for the file in the bundle's overall [JSON outline](#create_outline_file). Below is an example metadata:
++ **Markdown Metadata** - By default, `md-loader` automatically parses any found markdown metadata (defined at the top of the document between ««« and »»» or between --- and ---) into JSON. This metadata object is added as a node to the bundle's overall [JSON outline](#create_outline_file). Below is an example metadata:
 
   ```md
   ---
@@ -507,7 +509,7 @@ export function handle( event, args, recieved, next ) {
 **Return Schema**
 
 + **`html: String`** - The HTML representation of the resource.
-+ **`json: Object`** - An optional object that contains metadata about the resource. (This forms a node in the overall [JSON outline](#create_outline_file) generated by the bundler.)
++ **`json: Object`** - An optional object that contains metadata about the resource. (This metadata object is added as a node to the overall [JSON outline](#create_outline_file) generated by the bundler.)
 
 ###### Usage
 
