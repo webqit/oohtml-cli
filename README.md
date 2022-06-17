@@ -182,7 +182,7 @@ public
   │    └── main.html <main class="page-container">About Page</main>
 ```
 
-#### Schema
+#### Configuration Schema
 
 ```json
 {
