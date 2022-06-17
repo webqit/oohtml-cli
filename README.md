@@ -122,7 +122,7 @@ That said, lets go on to bundle.
 
 **`oohtml bundle`**
 
-The above command bundles files from the current working directory ibto a `bundle.html` file. Much of this can be customized using *flags* and other options.
+The above command bundles files from the current working directory into a `bundle.html` file. Much of this can be customized using *flags* and other options.
 
 ### Flags
 
@@ -269,7 +269,7 @@ Each entry has the following structure:
 
 + **`[args]`** - Optional list of parameters (arguments/flags) for a plugin - each in name/value pair.
 
-  On the command line, skip this question where not apply. Or follow the prompt to interactively specify parameters.  Entries are asked recursively.
+  > On the command line, skip this question where not apply. Or follow the prompt to interactively specify parameters.  Entries are asked recursively.
 
   Each entry has the following structure:
 
