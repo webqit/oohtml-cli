@@ -121,41 +121,45 @@ That said, much of this can be customized using *flags* and other options.
 
 ### Flags
 
-+ **`--recursive`**: This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as standalone directories and ignore them.
+#### `--recursive`
 
-  ```html
-  public
-    ├── about
-    │    └── main.html <main class="page-container">About Page</main>
-    ├── home
-    │    └── main.html <main class="page-container">Home Page</main>
-    ├── standalone <!-- This would be ignored by default because it has an index.html file -->
-    │    ├── home
-    │    │    └── main.html <main class="page-container">Home Page</main>
-    │    └── index.html <!DOCTYPE html>
-    └── index.html <!DOCTYPE html>
-  ```
+This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as standalone directories and ignore them.
 
-  Above, the `standalone` directory will recieve its own `bundle.html` for its contents. This gives us the following final structure:
+```html
+public
+  ├── about
+  │    └── main.html <main class="page-container">About Page</main>
+  ├── home
+  │    └── main.html <main class="page-container">Home Page</main>
+  ├── standalone <!-- This would be ignored by default because it has an index.html file -->
+  │    ├── home
+  │    │    └── main.html <main class="page-container">Home Page</main>
+  │    └── index.html <!DOCTYPE html>
+  └── index.html <!DOCTYPE html>
+```
 
-  ```html
-  public
-    ├── about
-    │    └── main.html <main class="page-container">About Page</main>
-    ├── home
-    │    └── main.html <main class="page-container">Home Page</main>
-    ├── standalone
-    │    ├── home
-    │    │    └── main.html <main class="page-container">Home Page</main>
-    │    ├── bundle.html <template name="home">...</template>
-    │    └── index.html <!DOCTYPE html>
-    ├── bundle.html <template name="about">...</template> <template name="home">...</template>
-    └── index.html <!DOCTYPE html>
-  ```
+Above, the `standalone` directory will recieve its own `bundle.html` for its contents. This gives us the following final structure:
 
-+ **`--auto-embed=[value]`**: This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template name="[value]" src="/bundle.html"></template>` element on it.
+```html
+public
+  ├── about
+  │    └── main.html <main class="page-container">About Page</main>
+  ├── home
+  │    └── main.html <main class="page-container">Home Page</main>
+  ├── standalone
+  │    ├── home
+  │    │    └── main.html <main class="page-container">Home Page</main>
+  │    ├── bundle.html <template name="home">...</template>
+  │    └── index.html <!DOCTYPE html>
+  ├── bundle.html <template name="about">...</template> <template name="home">...</template>
+  └── index.html <!DOCTYPE html>
+```
 
-  > Replace `[value]` with and actual module name; e.g. `pages`.
+#### `--auto-embed=[value]`
+
+This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template name="[value]" src="/bundle.html"></template>` element on it.
+
+> Replace `[value]` with and actual module name; e.g. `pages`.
 
 ### Other Options
 
