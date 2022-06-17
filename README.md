@@ -6,7 +6,7 @@
 
 <!-- /BADGES -->
 
-OOHTML Command Line is a utility that gives you automation over your hand-authored OOHTML-based UIs. You are able to go about coding in absolute free-form and then have everything automatically come to shape with a command. And it's an experience at the command line you'll love! [Learn more](https://github.com/webqit/oohtml-cli).
+OOHTML Command Line is a utility that automates certain aspects of your hand-authored OOHTML-based documents. You are able to go about coding in absolute free-form, with a view to having everything automatically come to shape with a command.
 
 
 ## Commands
@@ -15,7 +15,7 @@ OOHTML Command Line is a utility that gives you automation over your hand-author
 
 ## Command: `oohtml bundle`
 
-The **`oohtml bundle`** command is used to automatically bundle static HTML files from the filesystem into an *[HTML Module](http://github.com/webqit/oohtml#html-modules)*.
+The **`oohtml bundle`** command is used to automatically bundle static HTML files from the filesystem into *[HTML Module](http://github.com/webqit/oohtml#html-modules)* elements.
 
 ### Overview
 
