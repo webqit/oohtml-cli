@@ -330,7 +330,7 @@ This specifies the attribute that gives `<export>` elements (or [`[export_elemen
 
 ### Bundling Assets
 
-While HTML files are created by reading the file's contents, assets, like images, are handled differently. These files are copied from their location in [`[entry_dir]`](#entry_dir) into [`[output_dir]`](#output_dir) when these happen to be two different locations on the filesystem. Copying them to [`[output_dir]`](#output_dir) makes them accessible to HTTP requests. An appropriate HTML element that points to an asset's *public* location is automatically generated as a *module export* in the bundle. This is illustrated below.
+While HTML files are bundled by reading the file's contents, assets, like images, are handled differently. These files are copied from their location in [`[entry_dir]`](#entry_dir) into [`[output_dir]`](#output_dir) when these happen to be two different locations on the filesystem. Copying them to [`[output_dir]`](#output_dir) makes them accessible to HTTP requests. An appropriate HTML element that points to an asset's *public* location is automatically generated as a *module export* in the bundle. This is illustrated below.
 
 We have an image file at `my-app/views/about`, and we have set [`[entry_dir]`](#entry_dir) to `./views` and [`[output_dir]`](#output_dir) to `./public`.
 
