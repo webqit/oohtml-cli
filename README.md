@@ -12,6 +12,7 @@ OOHTML Command Line is a utility that automates certain aspects of your hand-aut
 ## Commands
 
 + [`oohtml bundle`](#command-oohtml-bundle)
++ [`oohtml config`](#command-oohtml-config)
 
 ## Command: `oohtml bundle`
 
@@ -28,7 +29,7 @@ public
   ├── about
   │    └── main.html <main class="page-container">About Page</main>
   ├── home
-  |    └── main.html <main class="page-container">Home Page</main>
+  │    └── main.html <main class="page-container">Home Page</main>
   └── index.html <!DOCTYPE html>
 ```
 
@@ -78,7 +79,7 @@ public
 </html>
 ```
 
-The **`oohtml bundle`** command acheives just that! Calling this command scans the current directory for those files and, this time, writes them to a new file named `bundle.html`. The bundle contains just the following content:
+The **`oohtml bundle`** command acheives just that! It scans the current directory for those files and, this time, writes them to a new file named `bundle.html`. The bundle contains just the following content:
 
 ```html
 <!--
@@ -94,7 +95,7 @@ public
 </template>
 ```
 
-And the `index.html` document links to the bundle as an external resource.
+And the `index.html` document is able to link to the bundle as an external resource.
 
 ```html
 <!--
@@ -116,28 +117,22 @@ public
 
 > You can find a working example of [a typical module structure](https://webqit.io/tooling/oohtml/docs/learn/examples/spa) right at OOHTML's documentation.
 
-That said, lets go on to bundle.
-
-### Syntax
-
-**`oohtml bundle`**
-
-The above command bundles files from the current working directory into a `bundle.html` file. Much of this can be customized using *flags* and other options.
+That said, much of this can be customized using *flags* and other options.
 
 ### Flags
 
-+ **`--recursive`**: This command makes the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as standalone directories and ignore them.
++ **`--recursive`**: This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as standalone directories and ignore them.
 
   ```html
   public
     ├── about
     │    └── main.html <main class="page-container">About Page</main>
     ├── home
-    |    └── main.html <main class="page-container">Home Page</main>
+    │    └── main.html <main class="page-container">Home Page</main>
     ├── standalone <!-- This would be ignored by default because it has an index.html file -->
-    |    ├── home
-    |    |    └── main.html <main class="page-container">Home Page</main>
-    |    └── index.html <!DOCTYPE html>
+    │    ├── home
+    │    │    └── main.html <main class="page-container">Home Page</main>
+    │    └── index.html <!DOCTYPE html>
     └── index.html <!DOCTYPE html>
   ```
 
@@ -148,19 +143,19 @@ The above command bundles files from the current working directory into a `bundl
     ├── about
     │    └── main.html <main class="page-container">About Page</main>
     ├── home
-    |    └── main.html <main class="page-container">Home Page</main>
+    │    └── main.html <main class="page-container">Home Page</main>
     ├── standalone
-    |    ├── home
-    |    |    └── main.html <main class="page-container">Home Page</main>
-    |    ├── bundle.html <template name="home">...</template>
-    |    └── index.html <!DOCTYPE html>
+    │    ├── home
+    │    │    └── main.html <main class="page-container">Home Page</main>
+    │    ├── bundle.html <template name="home">...</template>
+    │    └── index.html <!DOCTYPE html>
     ├── bundle.html <template name="about">...</template> <template name="home">...</template>
     └── index.html <!DOCTYPE html>
   ```
 
-+ **`--auto-embed=[value]`**: This command makes the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template name="[value]" src="/bundle.html"></template>` element on it.
++ **`--auto-embed=[value]`**: This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template name="[value]" src="/bundle.html"></template>` element on it.
 
-  > Replace `[value]` with and actual module name; e.g. `--auto-embed=pages`.
+  > Replace `[value]` with and actual module name; e.g. `pages`.
 
 ### Other Options
 
@@ -171,22 +166,21 @@ public
   ├── .webqit/oohtml-cli/bundler.json
 ```
 
-For advanced layout scenerios, a nested directory may have its `.webqit/oohtml-cli/bundler.json`, and the bundler will honour those configurations for that scope.
+For advanced layout scenerios, a nested directory may have its `.webqit/oohtml-cli/bundler.json`, and the bundler will honour those configurations down that subtree.
 
 ```html
 public
   ├── .webqit/oohtml-cli/bundler.json
   ├── about
-  |    ├── deep <!-- New configurations take effect from here -->
-  |    |    ├── .webqit/oohtml-cli/bundler.json
-  |    │    └── main.html <main class="page-container">Deep Page</main>
+  │    ├── deep <!-- New configurations take effect from here -->
+  │    │    ├── .webqit/oohtml-cli/bundler.json
+  │    │    └── main.html <main class="page-container">Deep Page</main>
   │    └── main.html <main class="page-container">About Page</main>
 ```
 
-#### Structure
+#### Schema
 
 ```json
-// bundler.json
 {
     "entry_dir": "./",
     "output_dir": "./",
@@ -205,36 +199,36 @@ public
 }
 ```
 
-> The `./.webqit/oohtml-cli/bundler.json` file may be edited by hand or from a command line walkthrough using `oohtml config bundler`.
+> The `./.webqit/oohtml-cli/bundler.json` file may be edited by hand or from a command line walkthrough using [`oohtml config bundler`](#command-oohtml-config).
 
 #### `[entry_dir]`
 
 This specifies the entry point into the filesystem. The default value is `./`, relative to its host directory. (An absolute path may also be used.)
 
-This is good for pointing the bundler to the actual *`views` (or equivalent)* folder when working from the actual project root. E.g. `./views`.
+This is good for pointing the bundler to the actual *`views` (or equivalent)* folder when working from the actual project root.
 
 ```html
 my-app
   ├── .webqit/oohtml-cli/bundler.json
   ├── views
-  |    └── about
-  |         └── main.html <main class="page-container">About Page</main>
+  │    └── about
+  │         └── main.html <main class="page-container">About Page</main>
 ```
 
 #### `[output_dir]`
 
 This specifies the output directory for the generated `bundle.html` file. The default value is `./`, relative to its host directory. (An absolute path may also be used.)
 
-This is good for pointing the bundler to the actual *`public` (or equivalent)* folder when working from the actual project root. E.g. `./public`.
+This is good for pointing the bundler to the actual *`public` (or equivalent)* folder when working from the actual project root.
 
 ```html
 my-app
   ├── .webqit/oohtml-cli/bundler.json
   ├── views
-  |    └── about
-  |         └── main.html <main class="page-container">About Page</main>
+  │    └── about
+  │          └── main.html <main class="page-container">About Page</main>
   └── public
-       └── index.html <!DOCTYPE html>
+        └── index.html <!DOCTYPE html>
 ```
 
 > Typical layouts have the `./public` (or equivalent) directory for both `[entry_dir]` and `[output_dir]`.
@@ -245,17 +239,17 @@ This specifies the file name of the output bundle. The default value is `./bundl
 
 #### `[public_base_url]`
 
-This specifies the HTTP path that maps to [`[output_dir]`](#output_dir) on the filesystem. The default value is `/`. The *`src` (or equivalent)* attribute of any automatically-embedded `<template>` element, plus every asset bundled, will be prefixed with this path.
+This specifies the HTTP URL that maps to [`[output_dir]`](#output_dir) on the filesystem. The default value is `/`. The *`src` (or equivalent)* attribute of any automatically-embedded `<template>` element, plus every asset bundled, will be prefixed with this path.
 
 #### `[max_data_url_size]`
 
-This specifies the upper limit of the file size under which to inline the contents of an image file or other asset as *[data URLs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)*. (See [Bundling Assets](#bundling-assets) below.) The default value is `1024`, in bytes. Assets smaller than this size will be bundled with *data URLs*.
+This specifies the upper limit of the file size under which to inline the contents of an image file or other asset as *[data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)*. (See [Bundling Assets](#bundling-assets) below.) The default value is `1024`, in bytes. Assets smaller than this size will be bundled as *data URL*.
 
 This is good for having small image files embed their own content instead of having them create additional HTTP requests on the page.
 
 #### `[plugins]`
 
-This specifies an optional list of plugins for the bundling operation. (See [Plugins](#bundler-plugins).) The default value is an empty array `[]`.
+This specifies an optional list of plugins for the bundling operation. (See [Bundler Plugins](#bundler-plugins).) The default value is an empty array `[]`.
 
 This is good for extending the capabilities of the bundler to custom-load or transform certain file formats that are not natively provided for.
 
