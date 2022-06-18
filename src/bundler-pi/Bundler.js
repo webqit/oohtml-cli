@@ -93,7 +93,7 @@ export default class Bundler {
 			waiting = this.cx.logger.waiting( `...` );
 			waiting.start();
 		}
-		let bundle = await this.readdir( params.entryDir );
+		let bundle = await this.readdir( params.entryDir, !params.filename ? this.indentation : 0 );
 		let result = await this.save( bundle, params.outputDir, params.filename );
 		if ( this.cx.logger ) {
 			waiting.stop();
@@ -169,7 +169,7 @@ export default class Bundler {
 		};
 		await readShift();
 		return {
-			type: 'bundle',
+			type: 'raw-bundle',
 			contents,
 			indentation,
 			total,
@@ -197,11 +197,18 @@ export default class Bundler {
 	}
 
 	async save( bundle, outdir, filename = null ) {
-		let params = await this.params, contents = [], outline = {};
+		let params = await this.params, contentsArray = [], outline = {};
 		await Object.keys( bundle.contents ).reduce( async ( prev, name ) => {
 			await prev;
 			let { html, json } = await this.route( { type: 'output', resource: bundle.contents[ name ], params }, async () => {
 				let resourceObj = bundle.contents[ name ];
+				if ( resourceObj.type === 'raw-bundle' ) {
+					let { contents, outline } = await this.save( resourceObj, Path.join( outdir, name ) );
+					return {
+						html: this.createModule( name, contents, params, resourceObj.indentation ),
+						json: outline,
+					}
+				}
 				if ( resourceObj.type === 'ext-bundle' ) {
 					if ( resourceObj.autoEmbed ) return {};
 					return {
@@ -210,9 +217,9 @@ export default class Bundler {
 					}
 				}
 				if ( resourceObj.type === 'bundle' ) {
-					let { contents, outline } = await this.save( resourceObj, Path.join( outdir, name ) );
+					let { contents, outline } = resourceObj;
 					return {
-						html: this.createModule( name, contents.join( '' ), params, resourceObj.indentation ),
+						html: this.createModule( name, contents, params, resourceObj.indentation ),
 						json: outline,
 					}
 				}
@@ -239,10 +246,12 @@ export default class Bundler {
 				}
 			} );
 			if ( html || json ) {
-				contents.push( html );
+				contentsArray.push( html );
 				outline[ name ] = json;
 			}
 		}, null );
+		// ----------
+		let contents = contentsArray.join( '' );
 		// ----------
 		if ( filename ) {
 			let publicDir = this.getNamespace( outdir, this.indentation ),
@@ -250,7 +259,7 @@ export default class Bundler {
 				jsonPublicUrl;
 			let outfile = Path.join( outdir, filename );
 			Fs.mkdirSync( Path.dirname( outfile ), { recursive: true } );
-			Fs.writeFileSync( outfile, contents.join( '' ) );
+			Fs.writeFileSync( outfile, contents );
 			if ( params.create_outline_file ) {
 				let filename2 = filename + '.json';
 				let outfileJson = Path.join( outdir, filename2 );
@@ -272,13 +281,14 @@ export default class Bundler {
 			return { htmlPublicUrl, jsonPublicUrl, type: 'ext-bundle', autoEmbed };
 		}
 		// ----------
-		return { contents, outline, total: bundle.total };
+		return { type: 'bundle', contents, outline, total: bundle.total, indentation: this.indentation };
 	}
 
 	createExtModule( name, htmlPublicUrl, params, indentation ) {
 		indentation = indentation;
-		let attrs = [ `${ params.module_id_attr }="${ name }"`, `src="${ htmlPublicUrl }"`, `loading="lazy"` ];
+		let attrs = [ `${ params.module_id_attr }="${ name }"`, `src="${ htmlPublicUrl }"` ];
 		if ( params.module_ext ) { attrs.unshift( `is="${ params.module_ext }"` ); }
+		if ( params.submodules_srcmode === 'lazy' ) { attrs.push( `loading="lazy"` ); }
 		return `\n${ ' '.repeat( indentation * 4 )}<template ${ attrs.join( ' ' ) }></template>`;
 	}
 

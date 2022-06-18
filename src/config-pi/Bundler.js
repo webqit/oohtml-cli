@@ -23,12 +23,13 @@ export default class Bundler extends Dotfile {
             entry_dir: './',
             output_dir: './',
             filename: './bundle.html',
-            public_base_url: '/',
-            max_data_url_size: 1024,
             plugins: [],
             // ---------
             // Advanced
             // ---------
+            public_base_url: '/',
+            max_data_url_size: 1024,
+            submodules_srcmode: 'eager',
             ignore_folders_by_prefix: ['.'],
             create_outline_file: 'create',
             // ---------
@@ -50,14 +51,18 @@ export default class Bundler extends Dotfile {
 
         // Choices hash...
         const CHOICES = _merge({
-            export_mode: [
-                {value: 'attribute', title: 'Use the "exportgroup" attribute'},
-                {value: 'element', title: 'Use the "export" element'},
+            submodules_srcmode: [
+                {value: 'eager', title: 'Eager'},
+                {value: 'lazy', title: 'Lazy'},
             ],
             create_outline_file: [
                 {value: '', title: 'No outline'},
                 {value: 'create', title: 'Create'},
                 {value: 'create_merge', title: 'Create and merge'},
+            ],
+            export_mode: [
+                {value: 'attribute', title: 'Use the "exportgroup" attribute'},
+                {value: 'element', title: 'Use the "export" element'},
             ],
         }, choices);
 
@@ -82,20 +87,6 @@ export default class Bundler extends Dotfile {
                 type: 'text',
                 message: '[filename]: Enter the output file name (absolute or relative to output_dir.)',
                 initial: DATA.filename,
-                validation: ['important'],
-            },
-            {
-                name: 'public_base_url',
-                type: 'text',
-                message: '[public_base_url]: Enter the base-URL for public resource URLs',
-                initial: DATA.public_base_url,
-                validation: ['important'],
-            },
-            {
-                name: 'max_data_url_size',
-                type: 'number',
-                message: '[max_data_url_size]: Enter the data-URL threshold for media files',
-                initial: DATA.max_data_url_size,
                 validation: ['important'],
             },
             {
@@ -148,6 +139,27 @@ export default class Bundler extends Dotfile {
                 active: 'YES',
                 inactive: 'NO',
                 initial: DATA.__advanced,
+            },
+            {
+                name: 'public_base_url',
+                type: (prev, answers) => answers.__advanced ? 'text' : null,
+                message: '[public_base_url]: Enter the base-URL for public resource URLs',
+                initial: DATA.public_base_url,
+                validation: ['important'],
+            },
+            {
+                name: 'max_data_url_size',
+                type: (prev, answers) => answers.__advanced ? 'number' : null,
+                message: '[max_data_url_size]: Enter the data-URL threshold for media files',
+                initial: DATA.max_data_url_size,
+                validation: ['important'],
+            },
+            {
+                name: 'submodules_srcmode',
+                type: (prev, answers) => answers.__advanced ? 'select' : null,
+                message: '[submodules_srcmode]: Choose the loading mode for submodules with remote content',
+                choices: CHOICES.submodules_srcmode,
+                initial: this.indexOfInitial(CHOICES.submodules_srcmode, DATA.submodules_srcmode),
             },
             {
                 name: 'ignore_folders_by_prefix',

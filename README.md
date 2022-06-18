@@ -123,7 +123,7 @@ That said, much of this can be customized using *flags* and other options.
 
 #### `--recursive`
 
-This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as standalone directories and ignore them.
+This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as *subroots* and ignore them.
 
 ```html
 public
@@ -131,14 +131,14 @@ public
   │    └── main.html <main class="page-container">About Page</main>
   ├── home
   │    └── main.html <main class="page-container">Home Page</main>
-  ├── standalone <!-- This would be ignored by default because it has an index.html file -->
+  ├── subroot <!-- This would be ignored by default because it has an index.html file -->
   │    ├── home
   │    │    └── main.html <main class="page-container">Home Page</main>
   │    └── index.html <!DOCTYPE html>
   └── index.html <!DOCTYPE html>
 ```
 
-Above, the `standalone` directory will recieve its own `bundle.html` for its contents. This gives us the following final structure:
+Above, the `subroot` directory will recieve its own `bundle.html` for its contents. This gives us the following final structure:
 
 ```html
 public
@@ -146,7 +146,7 @@ public
   │    └── main.html <main class="page-container">About Page</main>
   ├── home
   │    └── main.html <main class="page-container">Home Page</main>
-  ├── standalone
+  ├── subroot
   │    ├── home
   │    │    └── main.html <main class="page-container">Home Page</main>
   │    ├── bundle.html <template name="home">...</template>
@@ -170,20 +170,6 @@ public
   ├── .webqit/oohtml-cli/bundler.json
 ```
 
-For advanced layout scenerios, a nested directory may have its `.webqit/oohtml-cli/bundler.json`, and the bundler will honour those configurations down that subtree.
-
-```html
-public
-  ├── .webqit/oohtml-cli/bundler.json
-  ├── about
-  │    ├── deep <!-- New configurations take effect from here -->
-  │    │    ├── .webqit/oohtml-cli/bundler.json
-  │    │    └── main.html <main class="page-container">Deep Page</main>
-  │    └── main.html <main class="page-container">About Page</main>
-```
-
-#### Configuration Schema
-
 ```json
 {
     "entry_dir": "./",
@@ -191,6 +177,7 @@ public
     "filename": "./bundle.html",
     "public_base_url": "/",
     "max_data_url_size": 1024,
+    "submodules_srcmode": "eager",
     "plugins": [],
     "ignore_folders_by_prefix": ["."],
     "create_outline_file": "create",
@@ -201,6 +188,18 @@ public
     "export_element": "html-export",
     "export_id_attr": "export"
 }
+```
+
+For advanced layout scenerios, a nested directory may have its own `.webqit/oohtml-cli/bundler.json` config, and the bundler will honour those configurations down that subtree.
+
+```html
+public
+  ├── .webqit/oohtml-cli/bundler.json
+  ├── about
+  │    ├── deep <!-- New configurations take effect from here -->
+  │    │    ├── .webqit/oohtml-cli/bundler.json
+  │    │    └── main.html <main class="page-container">Deep Page</main>
+  │    └── main.html <main class="page-container">About Page</main>
 ```
 
 > The `./.webqit/oohtml-cli/bundler.json` file may be edited by hand or from a command line walkthrough using [`oohtml config bundler`](#command-oohtml-config).
@@ -241,15 +240,30 @@ my-app
 
 This specifies the file name of the output bundle. The default value is `./bundle.html`, which is resolved relative to [`[output_dir]`](#output_dir).
 
-#### `[public_base_url]`
+Where the given `.webqit/oohtml-cli/bundler.json` config is for a nested directory, having a non-empty `filename` means that the sub directory is bundled to its own `./bundle.html` file and only *linked* to the parent bundle as an external resource.
 
-This specifies the HTTP URL that maps to [`[output_dir]`](#output_dir) on the filesystem. The default value is `/`. The *`src` (or equivalent)* attribute of any automatically-embedded `<template>` element, plus every asset bundled, will be prefixed with this path.
+```html
+public
+  ├── .webqit/oohtml-cli/bundler.json
+  ├── about
+  │    ├── deep <!-- New configurations take effect from here -->
+  │    │    ├── .webqit/oohtml-cli/bundler.json
+  │    │    └── main.html <main class="page-container">Deep Page</main>
+  │    └── main.html <main class="page-container">About Page</main>
+```
 
-#### `[max_data_url_size]`
+```html
+<!--
+public
+ ├── bundle.html
+-->
+<template name="about">
+    <template name="deep" src="/about/deep/bundle.html"></template>
+    <main exportgroup="main.html" class="page-container">About Page</main>
+</template>
+```
 
-This specifies the upper limit of the file size under which to inline the contents of an image file or other asset as *[data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)*. (See [Bundling Assets](#bundling-assets) below.) The default value is `1024`, in bytes. Assets smaller than this size will be bundled as *data URL*.
-
-This is good for having small image files embed their own content instead of having them create additional HTTP requests on the page.
+> To add the OOHTML `loading="lazy"` attribute to linked modules, see [`[submodules_srcmode]`](#submodules_srcmode) below.
 
 #### `[plugins]`
 
@@ -275,6 +289,22 @@ Each entry has the following structure:
   + **`[value]`** - The value of the parameter. E.g. `github` - for the `flavor` parameter above.
 
 #### Advanced Options
+
+#### `[public_base_url]`
+
+This specifies the HTTP URL that maps to [`[output_dir]`](#output_dir) on the filesystem. The default value is `/`. The *`src` (or equivalent)* attribute of any automatically-embedded `<template>` element, plus every asset bundled, will be prefixed with this path.
+
+#### `[max_data_url_size]`
+
+This specifies at what file size an image, or other assets, should be bundled with inline *[data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs)*. (See [Bundling Assets](#bundling-assets) below.) The default value is `1024`, in bytes. Assets smaller than this size will be bundled with inline *data URL*.
+
+This is good for having small image files embed their own content instead of having them create additional HTTP requests on the page.
+
+#### `[submodules_srcmode]`
+
+This specifies the loading mode for sub modules that link to their own `bundle.html` file. (See [`[filename]`](#filename) above.) The default value is `eager`. Choose `lazy` when you want these modules to have the `loading="lazy"` attribute.
+
+> The OOHTML `loading="lazy"` attribute tells a module having the `src` attribute to only load its contents on-demand - on the first attempt to access its contents.
 
 #### `[ignore_folders_by_prefix]`
 
@@ -334,7 +364,7 @@ This specifies the attribute that gives `<export>` elements (or [`[export_elemen
 
 ### Bundling Assets
 
-While HTML files are bundled by reading the file's contents, assets, like images, are handled differently. These files are copied from their location in [`[entry_dir]`](#entry_dir) into [`[output_dir]`](#output_dir) when these happen to be two different locations on the filesystem. Copying them to [`[output_dir]`](#output_dir) makes them accessible to HTTP requests. An appropriate HTML element that points to an asset's *public* location is automatically generated as a *module export* in the bundle. This is illustrated below.
+While HTML files are bundled by reading the file's contents into the bundle, assets, like images, are handled differently. These files are copied from their location in [`[entry_dir]`](#entry_dir) into [`[output_dir]`](#output_dir) when these happen to be two different locations on the filesystem. Copying them to [`[output_dir]`](#output_dir) makes them accessible to HTTP requests. An appropriate HTML element that points to an asset's *public* location is automatically generated as a *module export* in the bundle. This is illustrated below.
 
 We have an image file at `my-app/views/about`, and we have set [`[entry_dir]`](#entry_dir) to `./views` and [`[output_dir]`](#output_dir) to `./public`.
 
@@ -518,3 +548,11 @@ export function handle( event, args, recieved, next ) {
 ###### Usage
 
 Custom plugins are used by specifying their filename in the [`[plugins]`](#plugins) config option. Plugins installed as an npm package are used by specifying their package name.
+
+## Getting Involved
+
+All forms of contributions and PR are welcome! To report bugs or request features, please submit an [issue](https://github.com/webqit/oohtml-cli/issues).
+
+## License
+
+MIT.
