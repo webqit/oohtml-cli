@@ -138,7 +138,7 @@ public
   └── index.html <!DOCTYPE html>
 ```
 
-Above, the `subroot` directory will recieve its own `bundle.html` for its contents. This gives us the following final structure:
+Above, the `subroot` directory will recieve its own `bundle.html` for its contents, and will be omitted from its parent bundle. This gives us the following final structure:
 
 ```html
 public
