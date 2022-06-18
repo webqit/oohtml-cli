@@ -6,7 +6,7 @@
 
 <!-- /BADGES -->
 
-OOHTML Command Line is a utility that automates certain aspects of your hand-authored OOHTML-based documents. You are able to go about coding in absolute free-form, with a view to having everything automatically come to shape with a command.
+OOHTML Command Line is a utility that automates certain aspects of your hand-authored OOHTML-based documents. You are able to go about coding in absolute free-form with a view to having everything automatically come to shape in one command.
 
 
 ## Commands
