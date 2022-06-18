@@ -165,6 +165,8 @@ This flag gets the bundler to automatically find the `index.html` document at it
 
 This utility lets us keep additional configurations to a JSON file, to have a better command-line experience! It expects to locate this file at `./.webqit/oohtml-cli/bundler.json`, relative to its entry directory.
 
+> The `./.webqit/oohtml-cli/bundler.json` file may be edited by hand or from a command line walkthrough using [`oohtml config bundler`](#command-oohtml-config).
+
 ```shell
 public
   ├── .webqit/oohtml-cli/bundler.json
@@ -201,8 +203,6 @@ public
   │    │    └── main.html <main class="page-container">Deep Page</main>
   │    └── main.html <main class="page-container">About Page</main>
 ```
-
-> The `./.webqit/oohtml-cli/bundler.json` file may be edited by hand or from a command line walkthrough using [`oohtml config bundler`](#command-oohtml-config).
 
 #### `[entry_dir]`
 
