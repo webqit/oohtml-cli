@@ -14,6 +14,18 @@ OOHTML Command Line is a utility that automates certain aspects of your hand-aut
 + [`oohtml bundle`](#command-oohtml-bundle)
 + [`oohtml config`](#command-oohtml-config)
 
+## Installation
+
+With [npm available on your terminal](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), run the following command to install OOHTML CLI.
+
+> System Requirements: Node.js 14.0 or later.
+
+```js
+npm i -g @webqit/oohtml-cli
+```
+
+> The `-g` flag above makes this installation global such that you can directly call `oohtml` from any directory. If you omit it, you may need to prefix each command in this documentation with `npx`; e.g. `npx oohtml bundle`.
+
 ## Command: `oohtml bundle`
 
 The **`oohtml bundle`** command is used to automatically bundle static HTML files from the filesystem into *[HTML Module](http://github.com/webqit/oohtml#html-modules)* elements.
