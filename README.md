@@ -562,7 +562,7 @@ Custom plugins are used by specifying their filename in the [`[plugins]`](#plugi
 
 ## Getting Involved
 
-All forms of contributions and PR are welcome! To report bugs or request features, please submit an [issue](https://github.com/webqit/oohtml-cli/issues).
+All forms of contributions and PR are welcome! To report bugs or request features, please submit an [issue](https://github.com/webqit/oohtml-cli/issues). For general discussions, ideation or community help, please join our github [Discussions](https://github.com/webqit/oohtml-cli/discussions).
 
 ## License
 
