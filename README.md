@@ -537,7 +537,7 @@ export function handle( event, args, recieved, next ) {
     console.log( args );
     return {
         html: '<style rel="stylesheet">...</style>'
-        json: '{',
+        json: {},
     };
 }
 ```
