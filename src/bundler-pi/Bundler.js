@@ -24,29 +24,31 @@ export default class Bundler {
 	 * A Bundler instance.
 	 *
 	 * @param Context		cx
-	 * @param Integer		indentation
+	 * @param Object		context
 	 *
 	 * @return void
 	 */
-	constructor( cx, indentation = 0 ) {
+	constructor( cx, context = { indentation: 0 } ) {
 		if ( !cx.config.Bundler ) {
 			throw new Error( `The Bundler configurator "config.Bundler" is required in context.` );
 		}
 		this.cx = cx;
-		this.indentation = indentation;
-		this.contentIndentation = indentation;
-		this.publicIndentation = indentation;
 		this.params = new Promise( async resolve => {
 			let config = await ( new this.cx.config.Bundler( this.cx ) ).read();
 			config.entryDir = Path.join( this.cx.CWD, config.entry_dir );
 			config.outputDir = Path.join( this.cx.CWD, config.output_dir );
 			config.outfile = config.filename && Path.join( config.outputDir, config.filename );
 			config.entryDirIsOutputDir = Path.resolve( config.outputDir ) === Path.resolve( config.entryDir );
+			config.indentation = context.indentation || 0;
+			config.contentIndentation = context.indentation;
+			config.publicIndentation = context.indentation;
 			if ( config.filename ) {
-				this.contentIndentation = 0;
+				config.contentIndentation = 0;
 			}
 			if ( config.public_base_url ) {
-				this.publicIndentation = 0;
+				config.publicIndentation = 0;
+			} else if ( config.public_base_url ) {
+				config.public_base_url = context.public_base_url;
 			}
 			if ( config.plugins ) {
 				if ( typeof config.plugins === 'string' ) {
@@ -101,7 +103,7 @@ export default class Bundler {
 			waiting = this.cx.logger.waiting( `...` );
 			waiting.start();
 		}
-		let bundle = await this.readdir( params.entryDir, this.contentIndentation );
+		let bundle = await this.readdir( params.entryDir, params.contentIndentation );
 		let result = await this.save( bundle, params.outputDir, params.filename );
 		if ( this.cx.logger ) {
 			waiting.stop();
@@ -150,7 +152,10 @@ export default class Bundler {
 				Fs.existsSync( subConfig.jsonDir ) || Fs.existsSync( Path.join( outdirEquivalent, 'index.html' ) )
 			) ) {
 				if ( this.cx.flags.recursive ) {
-					let subBundler = new this.constructor( subCx, this.indentation + indentation + 1 );
+					let subBundler = new this.constructor( subCx, {
+						indentation: params.indentation + indentation + 1,
+						public_base_url: params.public_base_url,
+					} );
 					resourceObj = await subBundler.bundle();
 				}
 			} else {
@@ -240,7 +245,7 @@ export default class Bundler {
 						Fs.mkdirSync( Path.dirname( absFilename ), { recursive: true } );
 						Fs.writeFileSync( absFilename, contents );
 					}
-					let publicDir = this.getNamespace( outdir, this.publicIndentation ),
+					let publicDir = this.getNamespace( outdir, params.publicIndentation ),
 						publicFilename = Path.join( params.public_base_url, publicDir, name );
 					if ( resourceObj.type.startsWith( 'image/' ) ) {
 						contents = `<img src="${ publicFilename }" />`;
@@ -264,7 +269,7 @@ export default class Bundler {
 		let contents = contentsArray.join( '' );
 		// ----------
 		if ( filename ) {
-			let publicDir = this.getNamespace( outdir, this.publicIndentation ),
+			let publicDir = this.getNamespace( outdir, params.publicIndentation ),
 				htmlPublicUrl,
 				jsonPublicUrl;
 			let outfile = Path.join( outdir, filename );
@@ -291,7 +296,7 @@ export default class Bundler {
 			return { htmlPublicUrl, jsonPublicUrl, type: 'ext-bundle', autoEmbed };
 		}
 		// ----------
-		return { type: 'bundle', contents, outline, total: bundle.total, indentation: this.indentation };
+		return { type: 'bundle', contents, outline, total: bundle.total, indentation: params.indentation };
 	}
 
 	createExtModule( name, htmlPublicUrl, params, indentation ) {
