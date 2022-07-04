@@ -34,12 +34,20 @@ export default class Bundler {
 		}
 		this.cx = cx;
 		this.indentation = indentation;
+		this.contentIndentation = indentation;
+		this.publicIndentation = indentation;
 		this.params = new Promise( async resolve => {
 			let config = await ( new this.cx.config.Bundler( this.cx ) ).read();
 			config.entryDir = Path.join( this.cx.CWD, config.entry_dir );
 			config.outputDir = Path.join( this.cx.CWD, config.output_dir );
 			config.outfile = config.filename && Path.join( config.outputDir, config.filename );
 			config.entryDirIsOutputDir = Path.resolve( config.outputDir ) === Path.resolve( config.entryDir );
+			if ( params.filename ) {
+				this.contentIndentation = 0;
+			}
+			if ( params.public_base_url ) {
+				this.publicIndentation = 0;
+			}
 			if ( config.plugins ) {
 				if ( typeof config.plugins === 'string' ) {
 					config.plugins = config.plugins.split( ',' );
@@ -93,7 +101,7 @@ export default class Bundler {
 			waiting = this.cx.logger.waiting( `...` );
 			waiting.start();
 		}
-		let bundle = await this.readdir( params.entryDir, !params.filename ? this.indentation : 0 );
+		let bundle = await this.readdir( params.entryDir, this.contentIndentation );
 		let result = await this.save( bundle, params.outputDir, params.filename );
 		if ( this.cx.logger ) {
 			waiting.stop();
@@ -232,7 +240,7 @@ export default class Bundler {
 						Fs.mkdirSync( Path.dirname( absFilename ), { recursive: true } );
 						Fs.writeFileSync( absFilename, contents );
 					}
-					let publicDir = this.getNamespace( outdir, this.indentation ),
+					let publicDir = this.getNamespace( outdir, this.publicIndentation ),
 						publicFilename = Path.join( params.public_base_url, publicDir, name );
 					if ( resourceObj.type.startsWith( 'image/' ) ) {
 						contents = `<img src="${ publicFilename }" />`;
@@ -256,7 +264,7 @@ export default class Bundler {
 		let contents = contentsArray.join( '' );
 		// ----------
 		if ( filename ) {
-			let publicDir = this.getNamespace( outdir, this.indentation ),
+			let publicDir = this.getNamespace( outdir, this.publicIndentation ),
 				htmlPublicUrl,
 				jsonPublicUrl;
 			let outfile = Path.join( outdir, filename );
