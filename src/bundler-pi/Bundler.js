@@ -155,7 +155,9 @@ export default class Bundler {
 					return this.load( resource, indentation );
 				});
 			}
-			if ( resourceObj ) {
+			if ( resourceObj && resourceObj.error ) {
+				console.warn( resourceObj.error );
+			} else if ( resourceObj ) {
 				total += resourceObj.total || 1;
 				if ( !resourceObj.type ) {
 					throw new Error( `Loader result object must have a "type" property.` );

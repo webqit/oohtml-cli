@@ -42,10 +42,10 @@ export function handle( event, args, recieved, next ) {
     // --------------
 
     json.outline = []
-    if ( args.code_highlighting || ( args.outline_generation || '' ).trim() ) {
+    if ( args.code_highlighting || args.outline_generation ) {
         let jsdomInstance = new Jsdom.JSDOM( contents ),
             contentElement = jsdomInstance.window.document.body.firstElementChild;
-        if ( ( args.outline_generation || '' ).trim() ) {
+        if ( args.outline_generation ) {
             let lastItem;
             contentElement.childNodes.forEach( node => {
                 let textContent = ( node.textContent || '' ).trim();
