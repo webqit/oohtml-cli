@@ -42,10 +42,10 @@ export default class Bundler {
 			config.outputDir = Path.join( this.cx.CWD, config.output_dir );
 			config.outfile = config.filename && Path.join( config.outputDir, config.filename );
 			config.entryDirIsOutputDir = Path.resolve( config.outputDir ) === Path.resolve( config.entryDir );
-			if ( params.filename ) {
+			if ( config.filename ) {
 				this.contentIndentation = 0;
 			}
-			if ( params.public_base_url ) {
+			if ( config.public_base_url ) {
 				this.publicIndentation = 0;
 			}
 			if ( config.plugins ) {
