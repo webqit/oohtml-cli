@@ -48,7 +48,8 @@ export default class Bundler {
 			if ( config.public_base_url ) {
 				config.publicIndentation = 0;
 			} else if ( context.public_base_url ) {
-				config.public_base_url = context.public_base_url;
+				let publicDir = this.getNamespace( config.outputDir, config.publicIndentation );
+				config.public_base_url = Path.join( context.public_base_url, publicDir );
 			}
 			if ( config.plugins ) {
 				if ( typeof config.plugins === 'string' ) {
