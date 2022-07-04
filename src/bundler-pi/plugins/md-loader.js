@@ -26,11 +26,14 @@ export function handle( event, args, recieved, next ) {
         type: 'lang', 
         filter: text => text.replace( /(?<=\])\(([^\)]*)?\)/g, ( match, matchGroup1 ) => {
             if ( !matchGroup1.match( /^(\/|#|http:|https:|file:|ftp:)/ ) ) {
-                return `(${ Path.join(args.base_url || event.params.public_base_url || '', Path.dirname( event.resource ), matchGroup1 ) })`;
+                return `(${ Path.join(args.base_url || event.params.public_base_url || '', getNamespace( Path.dirname(event.resource), event.params.publicIndentation ), matchGroup1 ) })`;
             }
             return match;
         } ),
     } );
+    let getNamespace = (filename, indentation) => {
+		return ( indentation && filename.replace( /\\/g, '/' ).split( '/' ).filter(s => s).slice( - indentation ).join( '/' ) ) || '';
+	};
     var showdownParams = { metadata: true, tables: true, extensions: [ fixLinksToReadme, fixRelativeUrls ] };
     var markdown = new Showdown.Converter( showdownParams );
     if ( args.flavor ) {
