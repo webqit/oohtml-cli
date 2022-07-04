@@ -26,7 +26,7 @@ export function handle( event, args, recieved, next ) {
         type: 'lang', 
         filter: text => text.replace( /(?<=\])\(([^\)]*)?\)/g, ( match, matchGroup1 ) => {
             if ( !matchGroup1.match( /^(\/|#|http:|https:|file:|ftp:)/ ) ) {
-                return `(${ Path.join(args.base_url || '', Path.dirname( event.resource ), matchGroup1 ) })`;
+                return `(${ Path.join(args.base_url || event.params.public_base_url || '', Path.dirname( event.resource ), matchGroup1 ) })`;
             }
             return match;
         } ),
