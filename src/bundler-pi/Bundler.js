@@ -47,7 +47,7 @@ export default class Bundler {
 			}
 			if ( config.public_base_url ) {
 				config.publicIndentation = 0;
-			} else if ( config.public_base_url ) {
+			} else if ( context.public_base_url ) {
 				config.public_base_url = context.public_base_url;
 			}
 			if ( config.plugins ) {
