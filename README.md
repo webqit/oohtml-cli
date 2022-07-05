@@ -455,7 +455,6 @@ The `md-loader` plugin is used to load `.md` (markdown) files into HTML exports,
 
 All parameters are optional.
 
-+ **`base_url`** - Set this to a value that will be used as the base URL for relative links. This is similar to how the [`[public_base_url]`](#public_base_url) option works.
 + **`outline_generation`** - Set this to a *non-empty* value to generate a JSON outline of the page's content. The generated outline will show up in the meta data for the file in the bundle's overall [JSON outline](#create_outline_file).
 + **`code_highlighting`** - Set this to a *non-empty* value to transform code blocks into stylable markup using the [Showdown-Highlight](https://github.com/Bloggify/showdown-highlight) utility. The transformed code blocks are highlighted in the UI on adding any of the [Highlight.js](https://highlightjs.org/) CSS to the page.
 + **`flavor`** - This equates to any of [Showdown's three flavours](https://github.com/showdownjs/showdown#flavors): `original`, `vanilla`, `github`.

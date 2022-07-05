@@ -141,7 +141,8 @@ export default class Bundler {
 			if ( !resources.length ) return;
 			let basename = resources.shift();
 			let resource = Path.join( dirname, basename );
-			if ( Path.resolve( resource ) === Path.resolve( params.outfile ) ) {
+			let a = Path.resolve( resource ), b = Path.resolve( params.outfile );
+			if ( a === b || a === `${b}.json` ) {
 				return readShift();
 			}
 			// ---------------------
@@ -195,20 +196,17 @@ export default class Bundler {
 		let params = await this.params;
 		let ext = Path.extname( resource ) || '';
 		let mime = Mime.lookup( ext );
-		let contents;
-		if ( mime && mime.startsWith( 'image/' ) ) {
+		let contents, size;
+		if ( mime && [ 'image/', 'video/', 'audio/' ].some( mimeClass => mime.startsWith( mimeClass ) ) ) {
 			contents = Fs.readFileSync( resource );
-			if ( Fs.statSync( resource ).size < params.max_data_url_size ) {
-				contents = `<img src="data:${ mime };base64,${ contents.toString( 'base64' ) }" />`;
-				mime = 'text/html';
-			}
+			size = Fs.statSync( resource ).size;
 		} else if ( mime === 'text/html' ) {
 			contents = Fs.readFileSync( resource ).toString();
 			if ( [ '<!doc', '<?xml' ].includes(( contents = contents.toString() ).trim().substring( 0, 5 ).toLowerCase() ) ) {
 				contents = null;
 			}
 		}
-		return contents && { contents, type: mime, indentation };
+		return contents && { contents, type: mime, size, indentation };
 	}
 
 	async save( bundle, outdir, filename = null ) {
@@ -217,6 +215,9 @@ export default class Bundler {
 			await prev;
 			let { html, json } = await this.route( { type: 'output', resource: bundle.contents[ name ], params }, async () => {
 				let resourceObj = bundle.contents[ name ];
+				if ( resourceObj.toOutput ) {
+					return resourceObj.toOutput();
+				}
 				if ( resourceObj.type === 'raw-bundle' ) {
 					let { contents, outline } = await this.save( resourceObj, Path.join( outdir, name ) );
 					return {
@@ -239,21 +240,28 @@ export default class Bundler {
 					}
 				}
 				let { contents, ...rest } = resourceObj;
-				if ( resourceObj.type !== 'text/html' ) {
-					if ( !params.entryDirIsOutputDir ) {
-						let absFilename = Path.join( outdir, name );
-						Fs.mkdirSync( Path.dirname( absFilename ), { recursive: true } );
-						Fs.writeFileSync( absFilename, contents );
+				if ( [ 'image/', 'video/', 'audio/' ].some( mimeClass => resourceObj.type.startsWith( mimeClass ) ) ) {
+					let src;
+					if ( resourceObj.size && resourceObj.size < params.max_data_url_size ) {
+						src = `data:${ resourceObj.type };base64,${ contents.toString( 'base64' ) }`;
+					} else {
+						if ( !params.entryDirIsOutputDir ) {
+							let absFilename = Path.join( outdir, name );
+							Fs.mkdirSync( Path.dirname( absFilename ), { recursive: true } );
+							Fs.writeFileSync( absFilename, contents );
+						}
+						let publicDir = this.getNamespace( outdir, params.publicIndentation );
+						src = Path.join( params.public_base_url, publicDir, name );
 					}
-					let publicDir = this.getNamespace( outdir, params.publicIndentation ),
-						publicFilename = Path.join( params.public_base_url, publicDir, name );
 					if ( resourceObj.type.startsWith( 'image/' ) ) {
-						contents = `<img src="${ publicFilename }" />`;
+						contents = `<img src="${ src }" />`;
 					} else if ( resourceObj.type.startsWith( 'video/' ) ) {
-						contents = `<video>\n\t<source src="${ publicFilename }" type="${ resourceObj.type }" />\n</video>`;
+						contents = `<video>\n\t<source src="${ src }" type="${ resourceObj.type }" />\n</video>`;
 					} else if ( resourceObj.type.startsWith( 'audio/' ) ) {
-						contents = `<audio>\n\t<source src="${ publicFilename }" type="${ resourceObj.type }" />\n</audio>`;
+						contents = `<audio>\n\t<source src="${ src }" type="${ resourceObj.type }" />\n</audio>`;
 					}
+				} else if ( resourceObj.type !== 'text/html' ) {
+					throw new Error( `Could not resolve output for a resource of type "${resourceObj.type}".` );
 				}
 				return {
 					html: this.createExport( name, contents, params, resourceObj.indentation ),
