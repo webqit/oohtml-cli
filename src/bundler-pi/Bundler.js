@@ -381,12 +381,20 @@ export default class Bundler {
 
 	normalizeIndentation( rawSource, expectedIndentLevel ) {
 		let rawSourceSplit = rawSource.split( /\n/g );
+		// Go past empty lines
 		while ( rawSourceSplit.length > 1 && !rawSourceSplit[ 0 ].trim().length ) rawSourceSplit.shift();
+		// Get indent level from first none-empty line
 		let firstLineIndentLevel = rawSourceSplit[ 0 ].split(/[^\s]/)[ 0 ].length;
 		if ( firstLineIndentLevel !== expectedIndentLevel * 4 ) {
+			let preFormattedBlock = 0;
 			return rawSourceSplit.map( ( line, i ) => {
+				let preStarters = line.split( /\<pre/g );
+				let preStoppers = line.split( /\<\/pre\>/g );
+				if ( preStarters.length > 1 ) preFormattedBlock += preStarters.length - 1;
+				if ( preStoppers.length > 1 ) preFormattedBlock -= preStoppers.length - 1;
+				if ( preFormattedBlock || preStoppers.length > 1 ) return line;
 				let lineIndentLevel = line.split(/[^\s]/)[ 0 ].length;
-				if (lineIndentLevel < firstLineIndentLevel) {
+				if ( lineIndentLevel < firstLineIndentLevel ) {
 					return ' '.repeat( Math.max( 0, (expectedIndentLevel * 4 ) - ( firstLineIndentLevel - lineIndentLevel ) ) ) + line.substring( lineIndentLevel );
 				}
 				return ' '.repeat( expectedIndentLevel * 4 ) + line.substring( firstLineIndentLevel );

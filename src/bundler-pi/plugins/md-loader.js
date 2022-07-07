@@ -12,7 +12,7 @@ import { _merge } from '@webqit/util/obj/index.js';
 import '../prism.js';
 
 export const type = 'input';
-export function handle( event, args, recieved, next ) {
+export async function handle( event, args, recieved, next ) {
     // Only .md files
     if ( recieved || !event.resource.endsWith('.md') ) return next( recieved );
     
@@ -26,7 +26,7 @@ export function handle( event, args, recieved, next ) {
         type: 'lang', 
         filter: text => text.replace( /(?<=\])\(([^\)]*)?\)/g, ( match, matchGroup1 ) => {
             if ( !matchGroup1.match( /^(\/|#|http:|https:|file:|ftp:)/ ) ) {
-                return `(${ Path.join(event.params.public_base_url || '', getNamespace( Path.dirname(event.resource), event.params.publicIndentation ), matchGroup1 ) })`;
+                return `(${ Path.join(event.params.public_base_url || '', getNamespace( Path.dirname(event.resource), event.params.publicIndentation + event.indentation ), matchGroup1 ) })`;
             }
             return match;
         } ),
@@ -40,7 +40,15 @@ export function handle( event, args, recieved, next ) {
         markdown.setFlavor( args.flavor );
     }
     let html = markdown.makeHtml (Fs.readFileSync( event.resource ).toString() );
-    let contents = `<div>\n${ html.split( /\n/g ).map( line => `\t${ line }` ).join( `\n` ) }\n</div>`;
+    let preFormattedBlock = 0;
+    let contents = `<div>\n${ html.split( /\n/g ).map( line => {
+        let preStarters = line.split( /\<pre/g );
+        let preStoppers = line.split( /\<\/pre\>/g );
+        if ( preStarters.length > 1 ) preFormattedBlock += preStarters.length - 1;
+        if ( preStoppers.length > 1 ) preFormattedBlock -= preStoppers.length - 1;
+        if ( preFormattedBlock || preStoppers.length > 1 ) return line;
+        return `\t${ line }`;
+     } ).join( `\n` ) }\n</div>`;
     let json = markdown.getMetadata();
     // --------------
 
@@ -76,8 +84,10 @@ export function handle( event, args, recieved, next ) {
             });
         }
         if ( args.code_highlighting ) {
-            contentElement.classList.add( 'line-numbers' );
-            contentElement.classList.add( 'match-braces' );
+            Array.from( contentElement.querySelectorAll( 'pre' ) ).forEach( el => {
+                el.classList.add( 'line-numbers' );
+                el.classList.add( 'match-braces' );
+            } );
             Prism.highlightAllUnder( contentElement );
             contents = contentElement.outerHTML;
         }
