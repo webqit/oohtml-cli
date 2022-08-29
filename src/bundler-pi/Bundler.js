@@ -425,6 +425,7 @@ export default class Bundler {
 			successLevel = 1;
 			let dom = new Jsdom.JSDOM( targetDocument ), by = 'oohtml-cli', touched;
 			let embed = ( src, after ) => {
+				src = src.replace(/\\/g, '/');
 				let embedded = dom.window.document.querySelector( `template[src="${ src }"]` );
 				if ( !embedded ) {
 					embedded = dom.window.document.createElement( 'template' );
@@ -445,6 +446,7 @@ export default class Bundler {
 			};
 			let unembed = src => {
 				src = Path.join( '/', src );
+				src = src.replace(/\\/g, '/');
 				let embedded = dom.window.document.querySelector( `template[src="${ src }"][by="${ by }"]` );
 				if ( embedded ) {
 					embedded.remove();
