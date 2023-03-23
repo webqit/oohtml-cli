@@ -63,17 +63,17 @@ export default class Bundler {
 						plugin = { name: plugin.trim() };
 					}
 					if ( _isObject( plugin ) && plugin.name ) {
-						var pluginName = plugin.name, isDefault;
+						let pluginName = plugin.name, isDefault;
 						if ( pluginName.startsWith( 'default:' ) ) {
-							isDefault = true;
 							pluginName = pluginName.replace( 'default:', '' );
+							isDefault = true;
 						}
 						// ---------------
-						var pluginUrl = pluginName;
+						let pluginUrl = pluginName;
 						if ( isDefault ) {
 							pluginUrl = Path.join( Path.dirname( import.meta.url ), '/plugins', pluginName + '.js' );
 						}
-						var imported;
+						let imported;
 						if ( Fs.existsSync( Url.fileURLToPath( pluginUrl ) ) && ( imported = await import( pluginUrl ) ) && imported.handle ) {
 							plugin = { ...imported, ...plugin, };
 						} else {
@@ -221,21 +221,21 @@ export default class Bundler {
 				if ( resourceObj.type === 'raw-bundle' ) {
 					let { contents, outline } = await this.save( resourceObj, Path.join( outdir, name ) );
 					return {
-						html: this.createModule( name, contents, params, resourceObj.indentation ),
+						html: this.createModuleExport( name, contents, params, resourceObj.indentation ),
 						json: outline,
 					}
 				}
 				if ( resourceObj.type === 'ext-bundle' ) {
 					if ( resourceObj.autoEmbed ) return {};
 					return {
-						html: this.createExtModule( name, resourceObj.htmlPublicUrl, params, resourceObj.indentation ),
+						html: this.createModuleExportRemote( name, resourceObj.htmlPublicUrl, params, resourceObj.indentation ),
 						json: resourceObj.jsonPublicUrl,
 					}
 				}
 				if ( resourceObj.type === 'bundle' ) {
 					let { contents, outline } = resourceObj;
 					return {
-						html: this.createModule( name, contents, params, resourceObj.indentation ),
+						html: this.createModuleExport( name, contents, params, resourceObj.indentation ),
 						json: outline,
 					}
 				}
@@ -264,7 +264,7 @@ export default class Bundler {
 					throw new Error( `Could not resolve output for a resource of type "${resourceObj.type}".` );
 				}
 				return {
-					html: this.createExport( name, contents, params, resourceObj.indentation ),
+					html: this.createFragmentExport( name, contents, params, resourceObj.indentation ),
 					...rest
 				}
 			} );
@@ -307,22 +307,24 @@ export default class Bundler {
 		return { type: 'bundle', contents, outline, total: bundle.total, indentation: params.indentation };
 	}
 
-	createExtModule( name, htmlPublicUrl, params, indentation ) {
-		indentation = indentation;
-		let attrs = [ `${ params.module_id_attr }="${ name }"`, `src="${ htmlPublicUrl }"` ];
-		if ( params.module_ext ) { attrs.unshift( `is="${ params.module_ext }"` ); }
-		if ( params.submodules_srcmode === 'lazy' ) { attrs.push( `loading="lazy"` ); }
+	createModuleExportRemote( name, htmlPublicUrl, params, indentation ) {
+		const attrs = [ `${ params.export_id_attr }="${ name }"` ];
+		if ( params.module_extends ) { attrs.push( `extends="${ params.module_extends }"` ); }
+		if ( params.module_inherits ) { attrs.push( `inherits="${ params.module_inherits }"` ); }
+		attrs.push( `src="${ htmlPublicUrl.replace(/\\/g, '/') }"` );
+		if ( params.module_src_mode === 'lazy' ) { attrs.push( `loading="lazy"` ); }
 		return `\n${ ' '.repeat( indentation * 4 )}<template ${ attrs.join( ' ' ) }></template>`;
 	}
 
-	createModule( name, contents, params, indentation ) {
+	createModuleExport( name, contents, params, indentation ) {
 		indentation = indentation - 1;
-		let attrs = [ `${ params.module_id_attr }="${ name }"` ];
-		if ( params.module_ext ) { attrs.unshift( `is="${ params.module_ext }"` ); }
+		let attrs = [ `${ params.export_id_attr }="${ name }"` ];
+		if ( params.module_extends ) { attrs.push( `extends="${ params.module_extends }"` ); }
+		if ( params.module_inherits ) { attrs.push( `inherits="${ params.module_inherits }"` ); }
 		return `\n${ ' '.repeat( indentation * 4 )}<template ${ attrs.join( ' ' ) }>${ contents }\n${ ' '.repeat( indentation * 4 )}</template>`;
 	}
 
-	createExport( name, contents, params, indentation ) {
+	createFragmentExport( name, contents, params, indentation ) {
 		// --------
 		const divideByComment = tag => {
 			let _comment = '', _tag;
@@ -362,15 +364,13 @@ export default class Bundler {
 				}
 				return [ null, quotes ];
 			}, [ null, [] ] );
-			var parts = [ tag.substring( 0, tagEnd ), tag.substring( tagEnd + 1 ) ];
-			var isSelfClosingTag = parts[ 0 ].trim().endsWith('/');
+			const parts = [ tag.substring( 0, tagEnd ), tag.substring( tagEnd + 1 ) ];
+			const isSelfClosingTag = parts[ 0 ].trim().endsWith('/');
 			return comment + ( isSelfClosingTag ? _beforeLast( parts[ 0 ], '/') : parts[ 0 ] ) + ' ' + attributeName + '="' + attributeValue + '"' + ( isSelfClosingTag ? ' /' : '' ) +  '>' + parts[ 1 ];
 		};
 		// --------
-		if ( params.export_mode === 'element' && params.export_element && params.export_id_attr ) {
-			contents = `<${ params.export_element } ${ params.export_id_attr }="${ name }">${ contents }</${ params.export_element }>`;
-		} else if ( params.export_mode === 'attribute' && params.export_group_attr && !getAttributeDefinition( contents, params.export_group_attr ) ) {
-			contents = defineAttribute( contents, params.export_group_attr, name );
+		if ( params.export_id_attr && !getAttributeDefinition( contents, params.export_id_attr ) ) {
+			contents = defineAttribute( contents, params.export_id_attr, `#${ name }` );
 		}
 		return "\n" + this.normalizeIndentation( contents, indentation );
 	}
@@ -429,10 +429,7 @@ export default class Bundler {
 				let embedded = dom.window.document.querySelector( `template[src="${ src }"]` );
 				if ( !embedded ) {
 					embedded = dom.window.document.createElement( 'template' );
-					if ( params.module_ext ) {
-						embedded.setAttribute( 'is', params.module_ext );
-					}
-					embedded.setAttribute( params.module_id_attr, name );
+					embedded.setAttribute( params.export_id_attr, name );
 					embedded.setAttribute( 'src', src );
 					embedded.setAttribute( 'by', by );
 					if ( after ) {
@@ -455,7 +452,7 @@ export default class Bundler {
 			};
 			embedList.reverse().reduce( ( prev, src ) => {
 				return embed( src, prev );
-			}, dom.window.document.querySelector( `template[${ params.module_id_attr }][src]` ) || dom.window.document.querySelector( `template[${ params.module_id_attr }]` ) );
+			}, dom.window.document.querySelector( `template[${ params.export_id_attr }][src]` ) || dom.window.document.querySelector( `template[${ params.export_id_attr }]` ) );
 			unembedList.forEach( src => {
 				unembed( src );
 			} );

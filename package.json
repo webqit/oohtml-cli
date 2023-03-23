@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@webqit/backpack": "^0.1.6",
-    "@webqit/util": "^0.8.7",
+    "@webqit/util": "^0.8.11",
     "jsdom": "^16.4.0",
     "prismjs": "^1.27.0",
     "showdown": "^1.9.1"
