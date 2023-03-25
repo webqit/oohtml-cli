@@ -312,7 +312,8 @@ export default class Bundler {
 		if ( params.module_extends ) { attrs.push( `extends="${ params.module_extends }"` ); }
 		if ( params.module_inherits ) { attrs.push( `inherits="${ params.module_inherits }"` ); }
 		attrs.push( `src="${ htmlPublicUrl.replace(/\\/g, '/') }"` );
-		if ( params.module_src_mode === 'lazy' ) { attrs.push( `loading="lazy"` ); }
+		if ( params.remote_module_ssr ) { attrs.push( `ssr` ); }
+		if ( params.remote_module_loading === 'lazy' ) { attrs.push( `loading="lazy"` ); }
 		return `\n${ ' '.repeat( indentation * 4 )}<template ${ attrs.join( ' ' ) }></template>`;
 	}
 
@@ -431,6 +432,7 @@ export default class Bundler {
 					embedded = dom.window.document.createElement( 'template' );
 					embedded.setAttribute( params.export_id_attr, name );
 					embedded.setAttribute( 'src', src );
+					embedded.toggleAttribute( 'ssr', params.remote_module_ssr );
 					embedded.setAttribute( 'by', by );
 					if ( after ) {
 						after.after( `\n\t\t`, embedded );

@@ -29,7 +29,8 @@ export default class Bundler extends Dotfile {
             // ---------
             module_inherits: '',
             module_extends: '',
-            module_src_mode: 'eager',
+            remote_module_loading: 'eager',
+            remote_module_ssr: true,
             public_base_url: '/',
             max_data_url_size: 1024,
             ignore_folders_by_prefix: ['.'],
@@ -48,7 +49,7 @@ export default class Bundler extends Dotfile {
 
         // Choices hash...
         const CHOICES = _merge({
-            module_src_mode: [
+            remote_module_loading: [
                 {value: 'eager', title: 'Eager'},
                 {value: 'lazy', title: 'Lazy'},
             ],
@@ -146,11 +147,19 @@ export default class Bundler extends Dotfile {
                 initial: DATA.module_extends,
             },
             {
-                name: 'module_src_mode',
+                name: 'remote_module_loading',
                 type: (prev, answers) => answers.__advanced ? 'select' : null,
-                message: '[module_src_mode]: Choose the loading mode for submodules with remote content',
-                choices: CHOICES.module_src_mode,
-                initial: this.indexOfInitial(CHOICES.module_src_mode, DATA.module_src_mode),
+                message: '[remote_module_loading]: Choose how to load remote modules',
+                choices: CHOICES.remote_module_loading,
+                initial: this.indexOfInitial(CHOICES.remote_module_loading, DATA.remote_module_loading),
+            },
+            {
+                name: 'remote_module_ssr',
+                type: (prev, answers) => answers.__advanced ? 'toggle' : null,
+                message: '[remote_module_ssr]: Choose whether to add the "SSR" boolean attribute to remote modules',
+                active: 'YES',
+                inactive: 'NO',
+                initial: DATA.remote_module_ssr,
             },
             {
                 name: 'public_base_url',
