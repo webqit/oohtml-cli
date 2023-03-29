@@ -22,7 +22,7 @@
     "oohtml": "src/oohtml-cli.js"
   },
   "scripts": {
-    "postversion": "npm publish",
+    "postversion": "npm publish --tag next",
     "postpublish": "git push && git push --tags"
   },
   "dependencies": {

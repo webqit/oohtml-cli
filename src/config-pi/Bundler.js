@@ -34,7 +34,7 @@ export default class Bundler extends Dotfile {
             public_base_url: '/',
             max_data_url_size: 1024,
             ignore_folders_by_prefix: ['.'],
-            create_outline_file: 'create',
+            create_outline_file: false,
             // ---------
             // OOHTML-related
             // ---------
@@ -52,11 +52,6 @@ export default class Bundler extends Dotfile {
             remote_module_loading: [
                 {value: 'eager', title: 'Eager'},
                 {value: 'lazy', title: 'Lazy'},
-            ],
-            create_outline_file: [
-                {value: '', title: 'No outline'},
-                {value: 'create', title: 'Create'},
-                {value: 'create_merge', title: 'Create and merge'},
             ],
         }, choices);
 
@@ -183,10 +178,11 @@ export default class Bundler extends Dotfile {
             },
             {
                 name: 'create_outline_file',
-                type: (prev, answers) => answers.__advanced ? 'select' : null,
+                type: (prev, answers) => answers.__advanced ? 'toggle' : null,
                 message: '[create_outline_file]: Choose whether to create an outline file',
-                choices: CHOICES.create_outline_file,
-                initial: this.indexOfInitial(CHOICES.create_outline_file, DATA.create_outline_file),
+                active: 'YES',
+                inactive: 'NO',
+                initial: DATA.create_outline_file,
             },
             // ---------
             // OOHTML-related
@@ -202,7 +198,7 @@ export default class Bundler extends Dotfile {
             {
                 name: 'export_id_attr',
                 type: (prev, answers) => answers.__advanced_oohtml ? 'text' : null,
-                message: '[export_id_attr]: Enter the export element\'s "name" attribute (e.g: name)',
+                message: '[export_id_attr]: Enter the export element\'s "exportid" attribute. (Default: exportid)',
                 initial: DATA.export_id_attr,
                 validation: ['important'],
             },
