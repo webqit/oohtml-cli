@@ -8,7 +8,7 @@
 
 OOHTML Command Line is a small utility that automates certain aspects of your hand-authored OOHTML-based documents. You are able to go about coding in absolute free-form with a view to having everything automatically come to shape in one command.
 
-> **Info** This is documentation for v1.x. (Looking for [v0.x](https://github.com/webqit/oohtml-cli/tree/v0.3.4)?)
+> **Info** This is documentation for `v1.x`. (Looking for [`v0.x`](https://github.com/webqit/oohtml-cli/tree/v0.3.4)?)
 
 ## Commands
 
