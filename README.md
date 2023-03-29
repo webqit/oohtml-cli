@@ -8,6 +8,8 @@
 
 OOHTML Command Line is a small utility that automates certain aspects of your hand-authored OOHTML-based documents. You are able to go about coding in absolute free-form with a view to having everything automatically come to shape in one command.
 
+> **Info** This is documentation for v1.x. (Looking for [v0.x](https://github.com/webqit/oohtml-cli/tree/v0.3.4)?)
+
 ## Commands
 
 + [`oohtml bundle`](#command-oohtml-bundle)
@@ -20,7 +22,7 @@ With [npm available on your terminal](https://docs.npmjs.com/downloading-and-ins
 > System Requirements: Node.js 14.0 or later.
 
 ```js
-npm i -g @webqit/oohtml-cli
+npm i -g @webqit/oohtml-cli@next
 ```
 
 > The `-g` flag above makes this installation global such that you can directly call `oohtml` from any directory. If you omit it, you may need to prefix each command in this documentation with `npx`; e.g. `npx oohtml bundle`.
@@ -47,14 +49,14 @@ public
 The goal is to translate the above layout into the following *module* structure...
 
 ```html
-<template name="pages">
+<template exportid="pages">
 
-    <template name="home">
-       <main exportgroup="main.html" class="page-container">Home Page</main>
+    <template exportid="home">
+       <main exportid="main.html" class="page-container">Home Page</main>
     </template>
 
-    <template name="about">
-       <main exportgroup="main.html" class="page-container">About Page</main>
+    <template exportid="about">
+       <main exportid="main.html" class="page-container">About Page</main>
     </template>
 
 </template>
@@ -71,21 +73,21 @@ public
 <html>
     <head>
         <title>FluffyPets</title>
-        <template name="pages">
+        <template exportid="pages">
 
-            <template name="home">
-                <main exportgroup="main.html" class="page-container">Home Page</main>
+            <template exportid="home">
+                <main exportid="main.html" class="page-container">Home Page</main>
             </template>
 
-            <template name="about">
-                <main exportgroup="main.html" class="page-container">About Page</main>
+            <template exportid="about">
+                <main exportid="main.html" class="page-container">About Page</main>
             </template>
 
         </template>
     </head>
     <body>
         <h1 data-id="headline"></h1>
-        <import name="main.html" template="pages"><import>
+        <import module="/pages/home/main.html"><import>
     </body>
 </html>
 ```
@@ -97,12 +99,12 @@ The **`oohtml bundle`** command acheives just that! It scans the current directo
 public
  ├── bundle.html
 -->
-<template name="home">
-    <main exportgroup="main.html" class="page-container">Home Page</main>
+<template exportid="home">
+    <main exportid="main.html" class="page-container">Home Page</main>
 </template>
 
-<template name="about">
-    <main exportgroup="main.html" class="page-container">About Page</main>
+<template exportid="about">
+    <main exportid="main.html" class="page-container">About Page</main>
 </template>
 ```
 
@@ -117,11 +119,11 @@ public
 <html>
     <head>
         <title>FluffyPets</title>
-        <template name="pages" src="/bundle.html"></template>
+        <template exportid="pages" src="/bundle.html"></template>
     </head>
     <body>
         <h1 data-id="headline"></h1>
-        <import name="main.html" template="pages"><import>
+        <import module="/pages/home/main.html"><import>
     </body>
 </html>
 ```
@@ -134,7 +136,7 @@ That said, much of this can be customized using *flags* and other options.
 
 #### `--recursive`
 
-This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` files. The default behaviour is to see them as *subroots* and ignore them.
+This flag gets the bundler to restart a new bundling process for nested directories that have their own `index.html` file. The default behaviour is to see them as *subroots* and ignore them.
 
 ```html
 public
@@ -160,15 +162,15 @@ public
   ├── subroot
   │    ├── home
   │    │    └── main.html <main class="page-container">Home Page</main>
-  │    ├── bundle.html <template name="home">...</template>
+  │    ├── bundle.html <template exportid="home">...</template>
   │    └── index.html <!DOCTYPE html>
-  ├── bundle.html <template name="about">...</template> <template name="home">...</template>
+  ├── bundle.html <template exportid="about">...</template> <template exportid="home">...</template>
   └── index.html <!DOCTYPE html>
 ```
 
 #### `--auto-embed=[value]`
 
-This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template name="[value]" src="/bundle.html"></template>` element on it.
+This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template exportid="[value]" src="/bundle.html"></template>` element on it.
 
 > Replace `[value]` with and actual module name; e.g. `pages`.
 
@@ -189,17 +191,18 @@ public
     "output_dir": "./",
     "filename": "./bundle.html",
     "plugins": [],
+
+    "module_inherits": "",
+    "module_extends": "",
+    "remote_module_loading": "eager",
+    "remote_module_ssr": true,
+
     "public_base_url": "/",
     "max_data_url_size": 1024,
-    "submodules_srcmode": "eager",
     "ignore_folders_by_prefix": ["."],
-    "create_outline_file": "create",
-    "module_ext": "",
-    "module_id_attr": "name",
-    "export_mode": "attribute",
-    "export_group_attr": "exportgroup",
-    "export_element": "html-export",
-    "export_id_attr": "export"
+    "create_outline_file": false,
+
+    "export_id_attr": "exportid"
 }
 ```
 
@@ -268,13 +271,13 @@ public
 public
  ├── bundle.html
 -->
-<template name="about">
-    <template name="deep" src="/about/deep/bundle.html"></template>
-    <main exportgroup="main.html" class="page-container">About Page</main>
+<template exportid="about">
+    <template exportid="deep" src="/about/deep/bundle.html"></template>
+    <main exportid="main.html" class="page-container">About Page</main>
 </template>
 ```
 
-> To add the OOHTML `loading="lazy"` attribute to linked modules, see [`[submodules_srcmode]`](#submodules_srcmode) below.
+> To add the OOHTML `loading="lazy"` attribute to linked modules, see [`[remote_module_loading]`](#remote_module_loading) below.
 
 #### `[plugins]`
 
@@ -303,7 +306,7 @@ Each entry has the following structure:
 
 #### `[public_base_url]`
 
-This specifies the HTTP URL that maps to [`[output_dir]`](#output_dir) on the filesystem. The default value is `/`. The *`src` (or equivalent)* attribute of any automatically-embedded `<template>` element, plus every asset bundled, will be prefixed with this path.
+This specifies the public path that maps to [`[output_dir]`](#output_dir) on the filesystem. The default value is `/`. The *`src` (or equivalent)* attribute of any automatically-embedded `<template>` element, plus every asset bundled, will be prefixed with this path.
 
 #### `[max_data_url_size]`
 
@@ -311,67 +314,103 @@ This specifies at what file size an image, or other assets, should be bundled wi
 
 This is good for having small image files embed their own content instead of having them create additional HTTP requests on the page.
 
-#### `[submodules_srcmode]`
+#### `[module_inherits]`
 
-This specifies the loading mode for sub modules that link to their own `bundle.html` file. (See [`[filename]`](#filename) above.) The default value is `eager`. Choose `lazy` when you want these modules to have the `loading="lazy"` attribute.
+This specifies a space-separated list of *sibling* module IDs that this module inherits, which when set, creates an `inherits` attribute on the module.
 
-> The OOHTML `loading="lazy"` attribute tells a module having the `src` attribute to only load its contents on-demand - on the first attempt to access its contents.
+```html
+<template exportid="pages">
+
+    <header exportid="header.html"></header>
+    <footer exportid="footer.html"></footer>
+
+    <template exportid="home" inherits="header.html footer.html">
+        <main exportid="main.html"></main>
+    </template>
+
+    <template exportid="about" inherits="header.html footer.html">
+        <main exportid="main.html"></main>
+    </template>
+
+</template>
+```
+
+*See [how the `inherits` attribute is treated](https://github.com/webqit/oohtml#inheriting-modules) in OOHTML.*
+
+#### `[module_extends]`
+
+This specifies a *sibling* module ID that this module extends, which when set, creates an `extends` attribute on the module.
+
+```html
+<template exportid="pages">
+
+    <template exportid="common">
+        <header exportid="header.html"></header>
+        <footer exportid="footer.html"></footer>
+    </template>
+
+    <template exportid="home" extends="common">
+        <main exportid="main.html"></main>
+    </template>
+
+    <template exportid="about" extends="common">
+        <main exportid="main.html"></main>
+    </template>
+
+</template>
+```
+
+*See [how the `extends` attribute is treated](https://github.com/webqit/oohtml#extending-modules) in OOHTML.*
+
+#### `[remote_module_loading]`
+
+This controls the loading mode for remote-loading modules - `<template src="..."></template>`, which when set to `lazy` adds the `loading="lazy"` attribute. The default value is `eager`.
+
+```html
+<template src="/bundle.html" loading="lazy"></template>
+```
+
+> The OOHTML `loading="lazy"` attribute tells a remote-loading module to only load its contents on-demand - on the first attempt to access its contents. (See [how lazy-loading works](https://github.com/webqit/oohtml-ssr#lazy-loading) in OOGTML.)
+
+#### `[remote_module_ssr]`
+
+This controls the "SSR" (Server-Side Rendering) flag for remote-loading modules - `<template src="..."></template>`, which when set, adds the `ssr` boolean attribute. The default value is `false`.
+
+```html
+<template ssr src="/bundle.html"></template>
+```
+
+> The `ssr` attribute enables resource loading for a given element during Server-Side Rendering. (See [how subresources are treated](https://github.com/webqit/oohtml-ssr#loading-subresources) during Server-Side Rendering.)
 
 #### `[ignore_folders_by_prefix]`
 
-This specifies a comma-separated list of prefixes for certain types of folders to ignore. Folders with a name that begins with any of the listed prefixes are ingnored. The default value is an array of one prefix: dot `.`.
+This specifies a comma-separated list of prefixes for certain types of folders to ignore. Folders with a name that begins with any of the listed prefixes are ingnored. The default value is an array of one prefix: `.`.
 
 This is good for excluding certain system folders or *dot directories* like `.git`. *Dot directories* are automatically excluded by the default value.
 
+```shell
+my-app
+  ├── .git
+  ├── public
+```
+
 #### `[create_outline_file]`
 
-This specifies whether or not to generate a JSON outline of the bundle. The default value is `create`. The generated file is named after [`[filename]`](#filename); e.g. `./bundle.html.json`. Set to `create_merge` to merge the generated JSON outline with any previously generated one. Set to *empty* to disable outline generation.
+This specifies whether or not to generate a JSON outline of the bundle. The generated file is named after [`[filename]`](#filename); e.g. `./bundle.html.json`. The default value is `false`.
+
+```shell
+public
+  ├── bundle.html
+  ├── bundle.html.json
+```
 
 This is good for programmatically traversing the bundle structure. Simply `JSON.parse()` the contents of `./bundle.html.json`.
 
 #### OOHTML-Related Options
 
-#### `[module_ext]`
-
-This specifies an extended tag name for the generated `<template>` elements. This value will be set to the `is` attribute of the `<template>` elements. The is empty by default.
-
-This is good for automatically extending generated `<template>` elements. A value like `customized-module` will generate `<template is="customized-module"></template>` elements.
-
-> Be sure to take into account the `element.template` setting in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
-
-#### `[module_id_attr]`
-
-This specifies the attribute that gives the generated `<template>` elements a name. The default value is `name` which conforms to [the default module ID attribute](https://webqit.io/tooling/oohtml/docs/spec/html-modules#convention) in the OOHTML spec.
-
-> This should generally only be changed to align with the `attr.moduleid` setting in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
-
-#### `[export_mode]`
-
-This specifies the syntax for representing the *module exports* within the generated `<template>` elements. The default value is `attribute` which translates to using the `exportgroup` attribute (or [`[export_group_attr]`](#export_group_attr)) to designate *module exports*. Set to `element` to use the `<export>` element (or [`[export_element]`](#export_element)) instead.  (See [the two standard convetions](https://webqit.io/tooling/oohtml/docs/spec/html-modules#convention).)
-
-#### `[export_group_attr]`
-
-This specifies the attribute that gives *module exports* a name when using the [attribute export mode](#export_mode). The default value is `exportgroup` which conforms to [the default syntax](https://webqit.io/tooling/oohtml/docs/spec/html-modules#convention) in the OOHTML spec. E.g. `<div exportgroup="export-id"></div>`.
-
-> This should generally only be changed to align with the `attr.exportgroup` setting in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
-
-> This option is only shown when the [`[export_mode]`](#export_mode) option is set to `attribute`.
-
-#### `[export_element]`
-
-This specifies the tag name for reprensenting *module exports* when using the [element export mode](#export_mode). The default value is `export` which conforms to [the default syntax](https://webqit.io/tooling/oohtml/docs/spec/html-modules#convention) in the OOHTML spec. E.g. `<export> <div></div> </export>`
-
-> This should generally only be changed to align with the `element.export` setting in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
-
-> This option is only shown when the [`[export_mode]`](#export_mode) option is set to `element`.
-
 #### `[export_id_attr]`
 
-This specifies the attribute that gives `<export>` elements (or [`[export_element]`](#export_element)) a name when using the [element export mode](#export_mode). The default value is `name` which conforms to [the default syntax](https://webqit.io/tooling/oohtml/docs/spec/html-modules#convention) in the OOHTML spec. E.g. `<export name="export-id"> <div></div> </export>`
-
-> This should generally only be changed to align with the `element.export` setting in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
-
-> This option is only shown when the [`[export_mode]`](#export_mode) option is set to `element`.
+This controls the attribute name `exportid` and should generally only be changed to align with custom settings in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
 
 ### Bundling Assets
 
@@ -408,26 +447,26 @@ my-app
 
 
 ```html
-<template name="home">
-    <main exportgroup="main.html" class="page-container">Home Page</main>
+<template exportid="home">
+    <main exportid="main.html" class="page-container">Home Page</main>
 </template>
 
-<template name="about">
-    <img exportgroup="image1.png" src="/about/image1.png" />
-    <main exportgroup="main.html" class="page-container">About Page</main>
+<template exportid="about">
+    <img exportid="image1.png" src="/about/image1.png" />
+    <main exportid="main.html" class="page-container">About Page</main>
 </template>
 ```
 
 But where the file size of that image is smaller than `1024` - [`[max_data_url_size]`](#max_data_url_size), its contents is *inlined* as [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs), and no copying takes place on the filesystem.
 
 ```html
-<template name="home">
-    <main exportgroup="main.html" class="page-container">Home Page</main>
+<template exportid="home">
+    <main exportid="main.html" class="page-container">Home Page</main>
 </template>
 
-<template name="about">
-    <img exportgroup="image1.png" src="data:image/png,%89PNG%0D%0A=" />
-    <main exportgroup="main.html" class="page-container">About Page</main>
+<template exportid="about">
+    <img exportid="image1.png" src="data:image/png,%89PNG%0D%0A=" />
+    <main exportid="main.html" class="page-container">About Page</main>
 </template>
 ```
 
