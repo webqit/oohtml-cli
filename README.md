@@ -380,7 +380,7 @@ This controls the "SSR" (Server-Side Rendering) flag for remote-loading modules 
 <template ssr src="/bundle.html"></template>
 ```
 
-> The `ssr` attribute enables resource loading for a given element during Server-Side Rendering. (See [how subresources are treated](https://github.com/webqit/oohtml-ssr#loading-subresources) during Server-Side Rendering.)
+> The `ssr` attribute enables resource loading for a given element during Server-Side Rendering. (See [how subresources are treated](https://github.com/webqit/oohtml-ssr#subresource-loading) during Server-Side Rendering.)
 
 #### `[ignore_folders_by_prefix]`
 
