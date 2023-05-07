@@ -129,7 +129,7 @@ public
 </html>
 ```
 
-> You can find a working example of [a typical module structure](https://webqit.io/tooling/oohtml/docs/learn/examples/spa) right at OOHTML's documentation.
+> You can find a working example of [a typical module structure](https://github.com/webqit/oohtml#put-together) right at OOHTML's documentation.
 
 That said, much of this can be customized using *flags* and other options.
 
@@ -203,7 +203,8 @@ public
     "ignore_folders_by_prefix": ["."],
     "create_outline_file": false,
 
-    "export_id_attr": "exportid"
+    "module_def_attr": "def",
+    "fragment_def_attr": "def"
 }
 ```
 
@@ -409,9 +410,13 @@ This is good for programmatically traversing the bundle structure. Simply `JSON.
 
 #### OOHTML-Related Options
 
-#### `[export_id_attr]`
+#### `[module_def_attr]`
 
-This controls the attribute name `exportid` and should generally only be changed to align with custom settings in the [OOHTML meta tag](https://webqit.io/tooling/oohtml/docs/spec/html-modules#polyfill-support) of the page where the bundle will be used.
+This controls the "Module Def" attribute name `def` for the template element and should generally only be changed to align with custom settings in the [OOHTML meta tag](https://github.com/webqit/oohtml#the-polyfill) of the page where the bundle will be used.
+
+#### `[fragment_def_attr]`
+
+This controls the "Fragment Def" attribute name `def` for the template's fragments and should generally only be changed to align with custom settings in the [OOHTML meta tag](https://github.com/webqit/oohtml#the-polyfill) of the page where the bundle will be used.
 
 ### Bundling Assets
 

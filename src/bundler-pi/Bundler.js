@@ -308,7 +308,7 @@ export default class Bundler {
 	}
 
 	createModuleExportRemote( name, htmlPublicUrl, params, indentation ) {
-		const attrs = [ `${ params.export_id_attr }="${ name }"` ];
+		const attrs = [ `${ params.module_def_attr }="${ name }"` ];
 		if ( params.module_extends ) { attrs.push( `extends="${ params.module_extends }"` ); }
 		if ( params.module_inherits ) { attrs.push( `inherits="${ params.module_inherits }"` ); }
 		attrs.push( `src="${ htmlPublicUrl.replace(/\\/g, '/') }"` );
@@ -319,7 +319,7 @@ export default class Bundler {
 
 	createModuleExport( name, contents, params, indentation ) {
 		indentation = indentation - 1;
-		let attrs = [ `${ params.export_id_attr }="${ name }"` ];
+		let attrs = [ `${ params.module_def_attr }="${ name }"` ];
 		if ( params.module_extends ) { attrs.push( `extends="${ params.module_extends }"` ); }
 		if ( params.module_inherits ) { attrs.push( `inherits="${ params.module_inherits }"` ); }
 		return `\n${ ' '.repeat( indentation * 4 )}<template ${ attrs.join( ' ' ) }>${ contents }\n${ ' '.repeat( indentation * 4 )}</template>`;
@@ -370,8 +370,8 @@ export default class Bundler {
 			return comment + ( isSelfClosingTag ? _beforeLast( parts[ 0 ], '/') : parts[ 0 ] ) + ' ' + attributeName + '="' + attributeValue + '"' + ( isSelfClosingTag ? ' /' : '' ) +  '>' + parts[ 1 ];
 		};
 		// --------
-		if ( params.export_id_attr && !getAttributeDefinition( contents, params.export_id_attr ) ) {
-			contents = defineAttribute( contents, params.export_id_attr, `#${ name }` );
+		if ( params.fragment_def_attr && !getAttributeDefinition( contents, params.fragment_def_attr ) ) {
+			contents = defineAttribute( contents, params.fragment_def_attr, name );
 		}
 		return "\n" + this.normalizeIndentation( contents, indentation );
 	}
@@ -430,7 +430,7 @@ export default class Bundler {
 				let embedded = dom.window.document.querySelector( `template[src="${ src }"]` );
 				if ( !embedded ) {
 					embedded = dom.window.document.createElement( 'template' );
-					embedded.setAttribute( params.export_id_attr, name );
+					embedded.setAttribute( params.module_def_attr, name );
 					embedded.setAttribute( 'src', src );
 					embedded.toggleAttribute( 'ssr', params.remote_module_ssr );
 					embedded.setAttribute( 'by', by );
@@ -454,7 +454,7 @@ export default class Bundler {
 			};
 			embedList.reverse().reduce( ( prev, src ) => {
 				return embed( src, prev );
-			}, dom.window.document.querySelector( `template[${ params.export_id_attr }][src]` ) || dom.window.document.querySelector( `template[${ params.export_id_attr }]` ) );
+			}, dom.window.document.querySelector( `template[${ params.module_def_attr }][src]` ) || dom.window.document.querySelector( `template[${ params.module_def_attr }]` ) );
 			unembedList.forEach( src => {
 				unembed( src );
 			} );

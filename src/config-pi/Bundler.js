@@ -38,7 +38,8 @@ export default class Bundler extends Dotfile {
             // ---------
             // OOHTML-related
             // ---------
-            export_id_attr: 'exportid',
+            module_def_attr: 'def',
+            fragment_def_attr: 'def',
         }, config);
     }
 
@@ -196,10 +197,17 @@ export default class Bundler extends Dotfile {
                 initial: DATA.__advanced,
             },
             {
-                name: 'export_id_attr',
+                name: 'module_def_attr',
                 type: (prev, answers) => answers.__advanced_oohtml ? 'text' : null,
-                message: '[export_id_attr]: Enter the export element\'s "exportid" attribute. (Default: exportid)',
-                initial: DATA.export_id_attr,
+                message: '[module_def_attr]: Enter the template element\'s "Module Def" attribute. (Default: def)',
+                initial: DATA.module_def_attr,
+                validation: ['important'],
+            },
+            {
+                name: 'fragment_def_attr',
+                type: (prev, answers) => answers.__advanced_oohtml ? 'text' : null,
+                message: '[fragment_def_attr]: Enter the template element\'s "Fragment Def" attribute. (Default: def)',
+                initial: DATA.fragment_def_attr,
                 validation: ['important'],
             },
         ];
