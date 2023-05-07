@@ -50,14 +50,14 @@ public
 The goal is to translate the above layout into the following *module* structure...
 
 ```html
-<template exportid="pages">
+<template def="pages">
 
-    <template exportid="home">
-       <main exportid="main.html" class="page-container">Home Page</main>
+    <template def="home">
+       <main def="main.html" class="page-container">Home Page</main>
     </template>
 
-    <template exportid="about">
-       <main exportid="main.html" class="page-container">About Page</main>
+    <template def="about">
+       <main def="main.html" class="page-container">About Page</main>
     </template>
 
 </template>
@@ -74,21 +74,21 @@ public
 <html>
     <head>
         <title>FluffyPets</title>
-        <template exportid="pages">
+        <template def="pages">
 
-            <template exportid="home">
-                <main exportid="main.html" class="page-container">Home Page</main>
+            <template def="home">
+                <main def="main.html" class="page-container">Home Page</main>
             </template>
 
-            <template exportid="about">
-                <main exportid="main.html" class="page-container">About Page</main>
+            <template def="about">
+                <main def="main.html" class="page-container">About Page</main>
             </template>
 
         </template>
     </head>
     <body>
         <h1 data-id="headline"></h1>
-        <import module="/pages/home/main.html"><import>
+        <import ref="/pages/home#main.html"><import>
     </body>
 </html>
 ```
@@ -100,12 +100,12 @@ The **`oohtml bundle`** command acheives just that! It scans the current directo
 public
  ├── bundle.html
 -->
-<template exportid="home">
-    <main exportid="main.html" class="page-container">Home Page</main>
+<template def="home">
+    <main def="main.html" class="page-container">Home Page</main>
 </template>
 
-<template exportid="about">
-    <main exportid="main.html" class="page-container">About Page</main>
+<template def="about">
+    <main def="main.html" class="page-container">About Page</main>
 </template>
 ```
 
@@ -120,11 +120,11 @@ public
 <html>
     <head>
         <title>FluffyPets</title>
-        <template exportid="pages" src="/bundle.html"></template>
+        <template def="pages" src="/bundle.html"></template>
     </head>
     <body>
         <h1 data-id="headline"></h1>
-        <import module="/pages/home/main.html"><import>
+        <import ref="/pages/home#main.html"><import>
     </body>
 </html>
 ```
@@ -163,15 +163,15 @@ public
   ├── subroot
   │    ├── home
   │    │    └── main.html <main class="page-container">Home Page</main>
-  │    ├── bundle.html <template exportid="home">...</template>
+  │    ├── bundle.html <template def="home">...</template>
   │    └── index.html <!DOCTYPE html>
-  ├── bundle.html <template exportid="about">...</template> <template exportid="home">...</template>
+  ├── bundle.html <template def="about">...</template> <template def="home">...</template>
   └── index.html <!DOCTYPE html>
 ```
 
 #### `--auto-embed=[value]`
 
-This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template exportid="[value]" src="/bundle.html"></template>` element on it.
+This flag gets the bundler to automatically find the `index.html` document at its entry directory and embed the appropriate `<template def="[value]" src="/bundle.html"></template>` element on it.
 
 > Replace `[value]` with and actual module name; e.g. `pages`.
 
@@ -273,9 +273,9 @@ public
 public
  ├── bundle.html
 -->
-<template exportid="about">
-    <template exportid="deep" src="/about/deep/bundle.html"></template>
-    <main exportid="main.html" class="page-container">About Page</main>
+<template def="about">
+    <template def="deep" src="/about/deep/bundle.html"></template>
+    <main def="main.html" class="page-container">About Page</main>
 </template>
 ```
 
@@ -321,17 +321,17 @@ This is good for having small image files embed their own content instead of hav
 This specifies a space-separated list of *sibling* module IDs that this module inherits, which when set, creates an `inherits` attribute on the module.
 
 ```html
-<template exportid="pages">
+<template def="pages">
 
-    <header exportid="header.html"></header>
-    <footer exportid="footer.html"></footer>
+    <header def="header.html"></header>
+    <footer def="footer.html"></footer>
 
-    <template exportid="home" inherits="header.html footer.html">
-        <main exportid="main.html"></main>
+    <template def="home" inherits="header.html footer.html">
+        <main def="main.html"></main>
     </template>
 
-    <template exportid="about" inherits="header.html footer.html">
-        <main exportid="main.html"></main>
+    <template def="about" inherits="header.html footer.html">
+        <main def="main.html"></main>
     </template>
 
 </template>
@@ -344,19 +344,19 @@ This specifies a space-separated list of *sibling* module IDs that this module i
 This specifies a *sibling* module ID that this module extends, which when set, creates an `extends` attribute on the module.
 
 ```html
-<template exportid="pages">
+<template def="pages">
 
-    <template exportid="common">
-        <header exportid="header.html"></header>
-        <footer exportid="footer.html"></footer>
+    <template def="common">
+        <header def="header.html"></header>
+        <footer def="footer.html"></footer>
     </template>
 
-    <template exportid="home" extends="common">
-        <main exportid="main.html"></main>
+    <template def="home" extends="common">
+        <main def="main.html"></main>
     </template>
 
-    <template exportid="about" extends="common">
-        <main exportid="main.html"></main>
+    <template def="about" extends="common">
+        <main def="main.html"></main>
     </template>
 
 </template>
@@ -453,26 +453,26 @@ my-app
 
 
 ```html
-<template exportid="home">
-    <main exportid="main.html" class="page-container">Home Page</main>
+<template def="home">
+    <main def="main.html" class="page-container">Home Page</main>
 </template>
 
-<template exportid="about">
-    <img exportid="image1.png" src="/about/image1.png" />
-    <main exportid="main.html" class="page-container">About Page</main>
+<template def="about">
+    <img def="image1.png" src="/about/image1.png" />
+    <main def="main.html" class="page-container">About Page</main>
 </template>
 ```
 
 But where the file size of that image is smaller than `1024` - [`[max_data_url_size]`](#max_data_url_size), its contents is *inlined* as [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs), and no copying takes place on the filesystem.
 
 ```html
-<template exportid="home">
-    <main exportid="main.html" class="page-container">Home Page</main>
+<template def="home">
+    <main def="main.html" class="page-container">Home Page</main>
 </template>
 
-<template exportid="about">
-    <img exportid="image1.png" src="data:image/png,%89PNG%0D%0A=" />
-    <main exportid="main.html" class="page-container">About Page</main>
+<template def="about">
+    <img def="image1.png" src="data:image/png,%89PNG%0D%0A=" />
+    <main def="main.html" class="page-container">About Page</main>
 </template>
 ```
 
