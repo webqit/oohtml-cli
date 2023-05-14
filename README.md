@@ -23,7 +23,7 @@ With [npm available on your terminal](https://docs.npmjs.com/downloading-and-ins
 > System Requirements: Node.js 14.0 or later.
 
 ```js
-npm i -g @webqit/oohtml-cli@next
+npm i -g @webqit/oohtml-cli
 ```
 
 > The `-g` flag above makes this installation global such that you can directly call `oohtml` from any directory. If you omit it, you may need to prefix each command in this documentation with `npx`; e.g. `npx oohtml bundle`.
