@@ -20,7 +20,7 @@ export default class Bundler extends Dotfile {
     // Defaults merger
     withDefaults(config) {
         return _merge({
-            entry_dir: './public',
+            entry_dir: './app',
             output_dir: './public',
             filename: './app.html',
             plugins: [],

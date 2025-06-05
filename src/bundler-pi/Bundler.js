@@ -302,7 +302,7 @@ export default class Bundler {
 			let autoEmbed = this.handleEmbeds( targetDocumentFile, embedList, unembedList, this.cx.flags[ 'auto-embed' ], params );
 			// ------------------
 			// Result
-			return { htmlPublicUrl, jsonPublicUrl, type: 'ext-bundle', autoEmbed };
+			return { outdir, outfile, htmlPublicUrl, jsonPublicUrl, type: 'ext-bundle', autoEmbed };
 		}
 		// ----------
 		return { type: 'bundle', contents, outline, total: bundle.total, indentation: params.indentation };
@@ -428,7 +428,7 @@ export default class Bundler {
 			let dom = new Jsdom.JSDOM( targetDocument ), by = 'oohtml-cli', touched;
 			let embed = ( src, after ) => {
 				src = src.replace(/\\/g, '/');
-				let embedded = dom.window.document.querySelector( `template[src="${ src }"]` );
+				let embedded = dom.window.document.head.querySelector( `template[src="${ src }"]` );
 				if ( !embedded ) {
 					embedded = dom.window.document.createElement( 'template' );
 					embedded.setAttribute( params.module_def_attr, name );
