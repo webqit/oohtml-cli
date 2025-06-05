@@ -430,7 +430,7 @@ export default class Bundler {
 			let dom = new Jsdom.JSDOM( targetDocument ), by = 'oohtml-cli', touched;
 			let embed = ( src, after ) => {
 				src = src.replace(/\\/g, '/');
-				let embedded = dom.window.document.head.querySelector( `template[src="${ src }"]` );
+				let embedded = dom.window.document/*IMPORTANT: Anywhere it is*/.querySelector( `template[${ params.module_def_attr }][src="${ src }"]` );
 				if ( !embedded ) {
 					embedded = dom.window.document.createElement( 'template' );
 					embedded.setAttribute( params.module_def_attr, name );
@@ -440,7 +440,7 @@ export default class Bundler {
 					if ( after ) {
 						after.after( `\n\t\t`, embedded );
 					} else {
-						dom.window.document.head.appendChild( embedded );
+						dom.window.document.head/*IMPORTANT: IN THE HEAD*/.appendChild( embedded );
 					}
 					touched = true;
 				}
@@ -449,7 +449,7 @@ export default class Bundler {
 			let unembed = src => {
 				src = Path.join( '/', src );
 				src = src.replace(/\\/g, '/');
-				let embedded = dom.window.document.querySelector( `template[src="${ src }"][by="${ by }"]` );
+				let embedded = dom.window.document/*IMPORTANT: Anywhere it is*/.querySelector( `template[${ params.module_def_attr }][src="${ src }"][by="${ by }"]` );
 				if ( embedded ) {
 					embedded.remove();
 					touched = true;
@@ -457,7 +457,7 @@ export default class Bundler {
 			};
 			embedList.reverse().reduce( ( prev, src ) => {
 				return embed( src, prev );
-			}, dom.window.document.querySelector( `template[${ params.module_def_attr }][src]` ) || dom.window.document.querySelector( `template[${ params.module_def_attr }]` ) );
+			}, dom.window.document.querySelector( `template[${ params.module_def_attr }][src]` )/*Close to existing remote modules*/ || dom.window.document.head/*Close to modules IN THE HEAD*/.querySelector( `template[${ params.module_def_attr }]` ) );
 			unembedList.forEach( src => {
 				unembed( src );
 			} );
