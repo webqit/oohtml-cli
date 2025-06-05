@@ -68,6 +68,15 @@ export default class Context {
         this.dict.layout = value;
     }
 
+    // options
+    get options() {
+        return this.dict.options || {};
+    }
+
+    set options(value) {
+        this.dict.options = value;
+    }
+
     // logger
     get logger() {
         return this.dict.logger;

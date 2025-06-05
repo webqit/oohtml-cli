@@ -35,6 +35,7 @@ export default class Bundler {
 		this.cx = cx;
 		this.params = new Promise( async resolve => {
 			let config = await ( new this.cx.config.Bundler( this.cx ) ).read();
+			config = { ...config, ...this.cx.options };
 			config.entryDir = Path.join( this.cx.CWD, config.entry_dir );
 			config.outputDir = Path.join( this.cx.CWD, config.output_dir );
 			config.outfile = config.filename && Path.join( config.outputDir, config.filename );

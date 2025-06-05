@@ -26,7 +26,7 @@
     "postpublish": "git push && git push --tags"
   },
   "dependencies": {
-    "@webqit/backpack": "^0.1.6",
+    "@webqit/backpack": "^0.1.9",
     "@webqit/util": "^0.8.11",
     "jsdom": "^16.4.0",
     "prismjs": "^1.27.0",
