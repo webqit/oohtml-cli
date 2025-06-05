@@ -284,10 +284,12 @@ export default class Bundler {
 			let outfile = Path.join( outdir, filename );
 			Fs.mkdirSync( Path.dirname( outfile ), { recursive: true } );
 			Fs.writeFileSync( outfile, contents );
+			const outfiles = [outfile];
 			if ( params.create_outline_file ) {
 				let filename2 = filename + '.json';
 				let outfileJson = Path.join( outdir, filename2 );
 				Fs.writeFileSync( outfileJson, JSON.stringify( outline, null, 4 ) );
+				outfiles.push(outfileJson);
 				jsonPublicUrl = Path.join( params.public_base_url, publicDir, filename2 );
 			}
 			htmlPublicUrl = Path.join( params.public_base_url, publicDir, filename );
@@ -302,7 +304,7 @@ export default class Bundler {
 			let autoEmbed = this.handleEmbeds( targetDocumentFile, embedList, unembedList, this.cx.flags[ 'auto-embed' ], params );
 			// ------------------
 			// Result
-			return { outdir, outfile, htmlPublicUrl, jsonPublicUrl, type: 'ext-bundle', autoEmbed };
+			return { outfiles, htmlPublicUrl, jsonPublicUrl, type: 'ext-bundle', autoEmbed };
 		}
 		// ----------
 		return { type: 'bundle', contents, outline, total: bundle.total, indentation: params.indentation };
