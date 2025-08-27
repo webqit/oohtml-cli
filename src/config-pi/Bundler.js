@@ -21,7 +21,7 @@ export default class Bundler extends Dotfile {
     withDefaults(config) {
         return _merge({
             entry_dir: './app',
-            output_dir: './public',
+            outdir: './public',
             filename: './app.html',
             plugins: [],
             // ---------
@@ -66,16 +66,16 @@ export default class Bundler extends Dotfile {
                 validation: ['important'],
             },
             {
-                name: 'output_dir',
+                name: 'outdir',
                 type: 'text',
-                message: '[output_dir]: Enter the output directory (absolute or relative to Current Working Directory.)',
-                initial: DATA.output_dir,
+                message: '[outdir]: Enter the output directory (absolute or relative to Current Working Directory.)',
+                initial: DATA.outdir,
                 validation: ['important'],
             },
             {
                 name: 'filename',
                 type: 'text',
-                message: '[filename]: Enter the output file name (absolute or relative to output_dir.)',
+                message: '[filename]: Enter the output file name (absolute or relative to outdir.)',
                 initial: DATA.filename,
                 validation: ['important'],
             },
