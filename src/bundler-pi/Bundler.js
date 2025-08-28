@@ -120,6 +120,7 @@ export default class Bundler {
 		if (process.send) {
 			process.send(result);
 		}
+		
 		return result;
 	}
 
